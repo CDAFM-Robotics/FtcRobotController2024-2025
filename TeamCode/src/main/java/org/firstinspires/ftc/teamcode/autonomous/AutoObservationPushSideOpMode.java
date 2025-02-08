@@ -51,7 +51,7 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     robot.setClawRotateServoPosition(Robot.CLAW_ROTATE_POSITION_STRAIGHT);
     robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_PICKUP_WALL);
 
-    // TODO GO TO WALL
+    // GO TO WALL
     Actions.runBlocking(rrTrajectories.barToObservationZoneAnd3Samples);
 
 
@@ -59,8 +59,8 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
     sleep(400);
 
-    robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_HANG);
-    robot.slideExtensionMotor.setPower(Robot.ARM_EXT_POWER_AUTO); // TODO revert SLOW Speed FOR WALL PICKUP
+    robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_HANG + 100);
+    robot.slideExtensionMotor.setPower(Robot.ARM_EXT_POWER_AUTO);
     robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG);
     robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_HANG);
 

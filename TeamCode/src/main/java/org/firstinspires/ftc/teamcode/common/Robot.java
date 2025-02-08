@@ -81,7 +81,7 @@ public class Robot {
   public static int ARM_EXT_HANG_ROBOT = 2100;
   public static int ARM_EXT_HANG_ROBOT_PULL = 200;
 
-  public static int ARM_EXT_AUTO_HANG = 1040; // TODO: 1009(1:21pm) 24Jan->1034->1040 little higher for different grip on spec
+  public static int ARM_EXT_AUTO_HANG = 1100; // TODO: 1009(1:21pm) 24Jan->1034->1040 little higher for different grip on spec
   public static int ARM_EXT_AUTO_HANG_PULL = 425;
   public static int ARM_EXT_AUTO_PICKUP = 1152; //todo fine tune
   public static int ARM_EXT_AUTO_DROP_OBSERVE = (int) (4600/2.66); //todo fine tune
@@ -93,11 +93,11 @@ public class Robot {
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
   public static int ARM_ROT_PICKUP_SAMPLES = 286;
   public static int ARM_ROT_PICKUP_WALL = 297;
-  public static int ARM_ROT_AUTO_PICKUP_WALL = 200;
-  public static int ARM_ROT_DRIVE = 547;
+  public static int ARM_ROT_AUTO_PICKUP_WALL = 297;
+  public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
-  public static int ARM_ROT_AUTO_HANG = 1040; //1068; //1160
-  public static int ARM_ROT_AUTO_DROP_OFF_SAMPLES = 1560;
+  public static int ARM_ROT_AUTO_HANG = 1068; //1068; //1160
+  public static int ARM_ROT_AUTO_DROP_OFF_SAMPLES = 1580;
   public static int ARM_ROT_AUTO_DRIVE = 1123;
   public static int ARM_ROT_AUTO_PICKUP = 356;
 
@@ -124,7 +124,7 @@ public class Robot {
   public static double CONVERT_INCHES_DEGREES_SLIDE = 1.0 / CONVERT_DEGREES_INCHES_SLIDE;
 
   // Arm down control
-  public static int SECONDS_DOWN_FAST = 2000;
+  public static int SECONDS_DOWN_FAST = 6000;
   public static int SECONDS_DOWN_SLOW = 8000;
   public static int CYCLE_TIME = 5;
 

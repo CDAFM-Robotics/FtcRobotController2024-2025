@@ -62,7 +62,7 @@ public class AutoNetSideOpMode extends LinearOpMode {
 
     robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_PICKUP_DIP);
 
-    sleep(300);
+    sleep(500); // TODO was 300 'bounce fix?'
 
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
 
@@ -100,7 +100,7 @@ public class AutoNetSideOpMode extends LinearOpMode {
 
     robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_PICKUP_DIP);
 
-    sleep(300);
+    sleep(500); // TODO was 300 'bounce fix?'
 
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
 

@@ -65,14 +65,14 @@ public class RRPushTrajectories {
     barToObservationZoneAnd3Samples = drive.actionBuilder(new Pose2d(10, -38.5, Math.PI / 2)) // 0,-31 -> 0,-36
       .setTangent(-Math.PI / 2) // TODO: 1:22 24Jan 50->53 (slightly more left)
             // TODO 28 speed constraint on trajectory
-      .splineToConstantHeading(new Vector2d(35, -34), Math.PI / 2, new TranslationalVelConstraint(26)) //x:40 was -24
-      .splineToConstantHeading(new Vector2d(40, -15), 0, new TranslationalVelConstraint(26))
-      .splineToConstantHeading(new Vector2d(51, -24), -Math.PI / 2, new TranslationalVelConstraint(26))
-      .splineToConstantHeading(new Vector2d(51, -53), -Math.PI / 2, new TranslationalVelConstraint(30)) // TODO
-      .splineToConstantHeading(new Vector2d(46, -24), Math.PI / 2, new TranslationalVelConstraint(26))
-      .splineToConstantHeading(new Vector2d(53, -15), 0, new TranslationalVelConstraint(26))
-      .splineToConstantHeading(new Vector2d(61, -24), -Math.PI / 2, new TranslationalVelConstraint(26))
-      .splineToConstantHeading(new Vector2d(61, -53), -Math.PI / 2, new TranslationalVelConstraint(30)) // TODO
+      .splineToConstantHeading(new Vector2d(35, -34), Math.PI / 2, new TranslationalVelConstraint(20)) //x:40 was -24
+      .splineToConstantHeading(new Vector2d(40, -15), 0, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(51, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(51, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
+      .splineToConstantHeading(new Vector2d(43, -24), Math.PI / 2, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(50, -15), 0, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(61, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(61, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
             // TODO ------------- position for wall approach
       .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO
       // -63 -> -62 // was -50 moved forward to hopefully not hit sample on spin.
