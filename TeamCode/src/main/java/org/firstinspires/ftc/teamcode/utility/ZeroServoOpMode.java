@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.common.Robot;
 
 @TeleOp(name = "Test Servo", group = "utility")
-@Disabled
 public class ZeroServoOpMode extends LinearOpMode {
   Servo servo = null;
   Robot robot = new Robot(this);
