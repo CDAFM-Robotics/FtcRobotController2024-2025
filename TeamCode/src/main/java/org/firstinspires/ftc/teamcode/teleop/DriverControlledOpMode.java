@@ -90,20 +90,15 @@ public class DriverControlledOpMode extends LinearOpMode {
       // Driver Arm Rotation Control
       if (currentGamepad2.left_stick_y < 0) {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
-        robot.setSlideRotationMotorTargetPosition(robot.ARM_ROT_DROP_OFF_SAMPLES);
+        robot.setSlideRotationMotorTargetPosition(Robot.ARM_ROT_DROP_OFF_SAMPLES);
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
       }
       else if (currentGamepad2.left_stick_y > 0) {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
-        // Try to set the target position to avoid arm drop due to gravity
-        tickPerCycle = (int) (robot.ARM_EXT_DROP_TOP_BASKET / ((robot.SECONDS_DOWN_FAST / robot.CYCLE_TIME
-                - robot.SECONDS_DOWN_SLOW / robot.CYCLE_TIME )
-                * currentGamepad2.left_stick_y + robot.SECONDS_DOWN_SLOW / robot.CYCLE_TIME));
-        robot.setSlideRotationMotorTargetPosition(robot.slideRotationMotor.getTargetPosition() - tickPerCycle);
+        robot.setSlideRotationMotorTargetPosition(-500);
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
-        telemetry.addData("left stick Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
       }
       else {
         if (currentGamepad2.left_stick_y == 0 && previousGamepad2.left_stick_y != 0 ) {
