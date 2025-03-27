@@ -111,10 +111,10 @@ public class Robot {
   public static int ARM_ROT_AUTO_DRIVE = 1123;
   public static int ARM_ROT_AUTO_PICKUP = 356;
 
-  public static double ARM_ROT_POWER = 1.0;  // TODO 0.5
+  public static double ARM_ROT_POWER = 1.0;  // TODO 0.5 (testing PID issue)
   public static double ARM_ROT_POWER_FULL = 1.0;
   public static double ARM_EXT_POWER = 1.0;
-  public static double ARM_EXT_POWER_AUTO = 1.0; //TODO 0.38
+  public static double ARM_EXT_POWER_AUTO = 0.38;
   public static double DRIVE_TRAIN_SPEED_FAST = 1;
   public static double DRIVE_TRAIN_SPEED_SLOW = 1.0 / 3.0;
 
