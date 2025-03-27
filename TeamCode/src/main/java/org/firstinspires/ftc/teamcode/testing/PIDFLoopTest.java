@@ -26,7 +26,7 @@ public class PIDFLoopTest extends OpMode {
   public static double UNEXTENDED_KCOS = 0.12;
   public static double EXTENDED_KCOS = 0.35;
 
-  public double Kp = 0.02, Ki = 0.05, Kd = 0.0005;
+  public static double Kp = 0.02, Ki = 0.05, Kd = 0.0005;
 
   public double interpolation;
 
@@ -48,14 +48,6 @@ public class PIDFLoopTest extends OpMode {
 
     slideRotationMotor = hardwareMap.get(DcMotorEx.class, "slideRotationMotor");
     slideRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-    slideExtensionMotor = hardwareMap.get(DcMotorEx.class, "slideExtensionMotor");
-    slideExtensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    slideExtensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    slideExtensionMotor.setTargetPosition(0);
-    slideExtensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
   }
 
   @Override
@@ -64,20 +56,11 @@ public class PIDFLoopTest extends OpMode {
 
     armPos = slideRotationMotor.getCurrentPosition();
 
-    interpolation = slideExtensionMotor.getCurrentPosition() / 3060.0;
-
-    Kp = target > armPos ? DOWN_UNEXTENDED_KP * interpolation + DOWN_EXTENDED_KP * (1 - interpolation) : UP_UNEXTENDED_KP * interpolation + UP_EXTENDED_KP * (1 - interpolation);
-    Ki = target > armPos ? DOWN_UNEXTENDED_KI * interpolation + DOWN_EXTENDED_KI * (1 - interpolation) : UP_UNEXTENDED_KI * interpolation + UP_EXTENDED_KI * (1 - interpolation);
-    Kd = target > armPos ? DOWN_UNEXTENDED_KD * interpolation + DOWN_EXTENDED_KD * (1 - interpolation) : UP_UNEXTENDED_KD * interpolation + UP_EXTENDED_KD * (1 - interpolation);
-
     controller.setPID(Kp, Ki, Kd);
 
     pidOutput = controller.calculate(armPos, target);
 
-    slideExtensionMotor.setTargetPosition(3060);
-    slideExtensionMotor.setPower(1);
-
-    ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS * interpolation + EXTENDED_KCOS * (1 - interpolation);
+    ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
 
     power = ffOutput + pidOutput;
 
