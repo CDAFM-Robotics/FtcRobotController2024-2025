@@ -54,7 +54,7 @@ public class AICameraTestOpMode extends LinearOpMode {
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         telemetry.setMsTransmissionInterval(11);
 
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(pipeline);
 
 
         limelight.start();
@@ -102,9 +102,16 @@ public class AICameraTestOpMode extends LinearOpMode {
             telemetry.addData("result x", xdist);
             telemetry.addData("result y", ydist);
 
+            double rotationsWheelDriveForward = ydist / Robot.LENGTH_CIRCUMFERENCE_WHEEL;
+            double rotationsWheelDriveLeft = xdist / Robot.LENGTH_CIRCUMFERENCE_WHEEL;
+            telemetry.addData("rotations needed to drive forward", rotationsWheelDriveForward);
+            telemetry.addData("rotations needed to drive left", rotationsWheelDriveLeft);
+
             telemetry.addData("pipeline", pipeline);
 
             telemetry.update();
+
+            }
         }
     }
-}
+

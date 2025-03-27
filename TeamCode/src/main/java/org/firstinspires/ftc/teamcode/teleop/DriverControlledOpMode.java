@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.common.Robot;
 
 @TeleOp(name = "Driver Control TeleOp", group = "0competition")
@@ -31,6 +32,8 @@ public class DriverControlledOpMode extends LinearOpMode {
   // Current arm and hand state and previous arm state
   ArmHandState armHandState;
   ArmHandState prevArmHandState;
+
+  
 
   // Define a timer
   ElapsedTime timer = new ElapsedTime();
@@ -63,6 +66,10 @@ public class DriverControlledOpMode extends LinearOpMode {
     telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
     telemetry.update();
 
+    while (opModeInInit()) {
+      robot.team = Robot.Team.RED;
+    }
+
     waitForStart();
 
     hangTimer.reset();
@@ -90,24 +97,19 @@ public class DriverControlledOpMode extends LinearOpMode {
       // Driver Arm Rotation Control
       if (currentGamepad2.left_stick_y < 0) {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
-        robot.setSlideRotationMotorTargetPosition(robot.ARM_ROT_DROP_OFF_SAMPLES);
+        robot.setSlideRotationMotorTargetPosition(Robot.ARM_ROT_DROP_OFF_SAMPLES);
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
       }
       else if (currentGamepad2.left_stick_y > 0) {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
-        // Try to set the target position to avoid arm drop due to gravity
-        tickPerCycle = (int) (robot.ARM_EXT_DROP_TOP_BASKET / ((robot.SECONDS_DOWN_FAST / robot.CYCLE_TIME
-                - robot.SECONDS_DOWN_SLOW / robot.CYCLE_TIME )
-                * currentGamepad2.left_stick_y + robot.SECONDS_DOWN_SLOW / robot.CYCLE_TIME));
-        robot.setSlideRotationMotorTargetPosition(robot.slideRotationMotor.getTargetPosition() - tickPerCycle);
+        robot.setSlideRotationMotorTargetPosition(-500);
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
-        telemetry.addData("left stick Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
       }
       else {
         if (currentGamepad2.left_stick_y == 0 && previousGamepad2.left_stick_y != 0 ) {
-          robot.setSlideRotationMotorPower(robot.ARM_ROT_POWER_FULL);
+          robot.setSlideRotationMotorPower(Robot.ARM_ROT_POWER_FULL);
           robot.setSlideRotationMotorTargetPosition(robot.getSlideRotationMotorCurrentPosition());
           prevArmHandState = armHandState;
           armHandState = ArmHandState.ARM_HOLD;
@@ -119,10 +121,10 @@ public class DriverControlledOpMode extends LinearOpMode {
         robot.setSlideExtensionMotorPower(currentGamepad2.right_stick_y * Math.pow(currentGamepad2.right_stick_y,2));
         if (robot.isArmPickup()) {
           robot.setRotationTargetForPickUp();
-          robot.setSlideExtMotorTargetPosWithLimit(robot.ARM_EXT_PICKUP_SAMPLES_EXT);
+          robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_PICKUP_SAMPLES_EXT);
         }
         else {
-          robot.setSlideExtMotorTargetPosWithLimit(robot.ARM_EXT_DROP_TOP_BASKET);
+          robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_DROP_TOP_BASKET);
         }
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
@@ -132,13 +134,13 @@ public class DriverControlledOpMode extends LinearOpMode {
         if (robot.isArmPickup()) {
           robot.setRotationTargetForPickUp();
         }
-        robot.setSlideExtensionMotorTargetPosition(robot.ARM_EXT_INIT);
+        robot.setSlideExtensionMotorTargetPosition(Robot.ARM_EXT_INIT);
         prevArmHandState = armHandState;
         armHandState = ArmHandState.DRIVER_CONTROL;
       }
       else {
         if (currentGamepad2.right_stick_y == 0 && previousGamepad2.right_stick_y != 0) {
-          robot.setSlideExtensionMotorPower(robot.ARM_EXT_POWER);
+          robot.setSlideExtensionMotorPower(Robot.ARM_EXT_POWER);
           robot.setSlideExtensionMotorTargetPosition(robot.getSlideExtensionMotorCurrentPosition());
           prevArmHandState = armHandState;
           armHandState = ArmHandState.ARM_HOLD;
@@ -153,7 +155,17 @@ public class DriverControlledOpMode extends LinearOpMode {
         robot.toggleClawGrabPosition();
       }
 
-      // the hand will perform the correct Actions
+      boolean sampleToPickup = robot.sampleToPickUp();
+
+      if (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN && robot.isArmPickup() &&
+        (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_1 &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_2 &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_3)) {
+        prevArmHandState = armHandState;
+        armHandState = ArmHandState.ARM_PICKUP;
+      }
+
       if (currentGamepad2.right_trigger > 0) {
         if (robot.isArmPickup()) {
           prevArmHandState = armHandState;
@@ -167,7 +179,12 @@ public class DriverControlledOpMode extends LinearOpMode {
           prevArmHandState = armHandState;
           armHandState = ArmHandState.ARM_DROP_READY;
         }
-
+      }
+      if (currentGamepad2.right_trigger > 0 || (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN &&
+        (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_1 &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_2 &&
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_3))) {
         switch (armHandState) {
           case ARM_PICKUP:
             prevArmHandState = armHandState;

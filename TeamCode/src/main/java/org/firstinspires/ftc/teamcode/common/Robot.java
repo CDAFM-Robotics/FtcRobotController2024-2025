@@ -1,7 +1,12 @@
 package org.firstinspires.ftc.teamcode.common;
 
+import static org.firstinspires.ftc.teamcode.common.Robot.Color.*;
+
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -14,8 +19,8 @@ public class Robot {
   public DcMotor backLeftMotor = null;
   public DcMotor backRightMotor = null;
 
-  public DcMotor slideExtensionMotor = null;
-  public DcMotor slideRotationMotor = null;
+  public DcMotorEx slideExtensionMotor = null;
+  public DcMotorEx slideRotationMotor = null;
 
   public Servo clawGrabServo = null;
   public Servo clawPanServo = null;
@@ -25,8 +30,13 @@ public class Robot {
 
   // Constants
 
-  public static double CLAW_GRAB_POSITION_CLOSED = 0.0;
-  public static double CLAW_GRAB_POSITION_OPEN = 0.5;
+  public enum Team {
+    RED,
+    BLUE
+  }
+
+  public static double CLAW_GRAB_POSITION_CLOSED = 0.5; // was 0.0 (old finger clocking)
+  public static double CLAW_GRAB_POSITION_OPEN = 1.0; // was (0.625 old finger clocking)
 
   public static double CLAW_ROTATE_POSITION_STRAIGHT = 0.5;
   public static double CLAW_ROTATE_POSITION_AUTO_PICKUP = 0.65;
@@ -35,7 +45,7 @@ public class Robot {
   public static double CLAW_PAN_TELEOP_INIT = 0.65;
   public static double CLAW_PAN_POSITION_DROP_DIP = 0.6; // don't retract slide with this position!!!
   public static double CLAW_PAN_POSITION_STRAIGHT = 0.225;
-  public static double CLAW_PAN_POSITION_PICKUP_DIP = 0.135;          ;
+  public static double CLAW_PAN_POSITION_PICKUP_DIP = 0.135;
   public static double CLAW_PAN_POSITION_PICKUP_WALL = 0.5450;
   public static double CLAW_PAN_POSITION_AUTO_PICKUP_WALL = 0.5494;
   public static double CLAW_PAN_POSITION_TOP_SPECIMEN = 0.245;
@@ -45,7 +55,7 @@ public class Robot {
   public static double CLAW_PAN_POSITION_AUTO_DROP_DIP = 0.6;
   public static double CLAW_PAN_POSITION_AUTO_STRAIGHT = 0.225;
   public static double CLAW_PAN_POSITION_AUTO_PICKUP = 0.225;
-  public static double CLAW_PAN_POSITION_AUTO_PICKUP_DIP = 0.135;          ;
+  public static double CLAW_PAN_POSITION_AUTO_PICKUP_DIP = 0.135;
   public static double CLAW_PAN_SPEED = 0.025;
 
   public static double CLAW_ROTATE_SPEED = 0.100;
@@ -91,7 +101,7 @@ public class Robot {
   public static int ARM_ROT_DROP_OFF_SAMPLES = 1560;
   public static int ARM_ROT_DROP_OFF_SAMPLES_BOTTOM = 1525;
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
-  public static int ARM_ROT_PICKUP_SAMPLES = 286;
+  public static int ARM_ROT_PICKUP_SAMPLES = 350;
   public static int ARM_ROT_PICKUP_WALL = 297;
   public static int ARM_ROT_AUTO_PICKUP_WALL = 297;
   public static int ARM_ROT_DRIVE = 650;
@@ -101,11 +111,11 @@ public class Robot {
   public static int ARM_ROT_AUTO_DRIVE = 1123;
   public static int ARM_ROT_AUTO_PICKUP = 356;
 
-  public static double ARM_ROT_POWER = 0.5;
+  public static double ARM_ROT_POWER = 1.0;  // TODO 0.5 (testing PID issue)
   public static double ARM_ROT_POWER_FULL = 1.0;
   public static double ARM_EXT_POWER = 1.0;
   public static double ARM_EXT_POWER_AUTO = 0.38;
-  public static double DRIVE_TRAIN_SPEED_FAST = 0.75;
+  public static double DRIVE_TRAIN_SPEED_FAST = 1;
   public static double DRIVE_TRAIN_SPEED_SLOW = 1.0 / 3.0;
 
   public static double LENGTH_CLAW = 7;
@@ -113,8 +123,9 @@ public class Robot {
   public static double LENGTH_INSPECTION_BACK = 0;
   public static double LENGTH_ARM_EXTENDED = 50;
   public static double LENGTH_ARM_NORMAL = 13.375;
-  public static double LIMELIGHT_CAMERA_HEIGHT = 10.875;
+  public static double LIMELIGHT_CAMERA_HEIGHT = 12.5;
   public static double LIMELIGHT_CAMERA_ANGLE = 80.0;
+  public static double LENGTH_CIRCUMFERENCE_WHEEL = 10.995574287564276;
 
   public static double CONVERT_DEGREES_TICKS_117RPM = 3.95861111111;
   public static double CONVERT_TICKS_DEGREES_117RPM = 1.0 / CONVERT_DEGREES_TICKS_117RPM;
@@ -152,6 +163,29 @@ public class Robot {
   double clawRotatePosition = CLAW_ROTATE_POSITION_STRAIGHT;
   double driveSpeed = DRIVE_TRAIN_SPEED_FAST;
 
+  ColorSensor colorSensor = null;
+
+  int red;
+  int green;
+  int blue;
+  int alpha;
+
+  int[][] redValues = {{300, 150, 50}, {1400, 800, 500}};
+  int[][] yellowValues = {{1000, 1550, 100}, {3000, 4000, 1000}};
+  int[][] blueValues = {{50, 100, 800}, {350, 700, 2100}};
+
+  public enum Color {
+    RED,
+    YELLOW,
+    BLUE,
+    UNKNOWN
+  }
+
+  public Team team = Team.RED;
+
+  Color color;
+
+
 
   public Robot(LinearOpMode opMode) {
     myOpMode = opMode;
@@ -177,20 +211,20 @@ public class Robot {
   }
 
   public void initializeArmDevices() {
-    slideExtensionMotor = myOpMode.hardwareMap.get(DcMotor.class, "slideExtensionMotor");
-    slideRotationMotor = myOpMode.hardwareMap.get(DcMotor.class, "slideRotationMotor");
+    slideExtensionMotor = myOpMode.hardwareMap.get(DcMotorEx.class, "slideExtensionMotor");
+    slideRotationMotor = myOpMode.hardwareMap.get(DcMotorEx.class, "slideRotationMotor");
 
     clawGrabServo = myOpMode.hardwareMap.get(Servo.class, "clawGrabServo");
     clawPanServo = myOpMode.hardwareMap.get(Servo.class, "clawPanServo");
     clawRotateServo = myOpMode.hardwareMap.get(Servo.class, "clawRotateServo");
 
-    slideRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    slideRotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    slideRotationMotor.setTargetPosition(ARM_ROT_INIT);
-    slideRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    slideRotationMotor.setPower(ARM_ROT_POWER_FULL);
+    colorSensor = myOpMode.hardwareMap.get(ColorSensor.class, "colorSensor");
 
+    slideRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+    slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    slideRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    controller = new PIDController(0, 0, 0);
 
     slideExtensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     slideExtensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -257,8 +291,9 @@ public class Robot {
   }
 
   // Set Slide Rotation Motor power
+  public double slideRotationPower = 1;
   public void setSlideRotationMotorPower(double power) {
-    slideRotationMotor.setPower(power);
+    slideRotationPower = power;
   }
 
   // Set Slide Rotation Motor position
@@ -354,7 +389,7 @@ public class Robot {
   }
 
   public void pickupPosition() {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_PICKUP_SAMPLES;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_PICKUP_SAMPLES;
@@ -363,7 +398,7 @@ public class Robot {
   }
 
   public void dropTopBasket() {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_DROP_OFF_SAMPLES;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_DROP_TOP_BASKET;
@@ -372,7 +407,7 @@ public class Robot {
 
   // Bottom Basket Drop
   public void dropBottomBasket() {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_DROP_OFF_SAMPLES_BOTTOM;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_DROP_BOTTOM_BASKET;
@@ -381,7 +416,7 @@ public class Robot {
 
   //Wall Pickup
   public void wallPickup () {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_PICKUP_WALL;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_PICKUP_WALL;
@@ -391,7 +426,7 @@ public class Robot {
 
   // Top Specimen Bar
   public void topSpecimenBar () {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_HANG_TOP_SPECIMEN;
     clawPanPosition = CLAW_PAN_POSITION_TOP_SPECIMEN;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
@@ -410,7 +445,7 @@ public class Robot {
 
   // Drive Position
   public void drivePosition () {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_DRIVE;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_DRIVE;
@@ -444,24 +479,58 @@ public class Robot {
   public void moveArmToPosition() {
     myOpMode.telemetry.addData("slideRotationTargetPosition", "start %d", slideRotationTargetPosition);
     myOpMode.telemetry.addData("slideExtensionTargetPosition", "start %d", slideExtensionTargetPosition);
-    if (slideExtensionTargetPosition > slideExtensionMotor.getCurrentPosition()) {
-      slideRotationMotor.setTargetPosition(slideRotationTargetPosition);
-      if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 10) {
-        checkExtentionLimit();
-        slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
-      }
-    } else if (slideExtensionTargetPosition < slideExtensionMotor.getCurrentPosition()) {
-      slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
-      if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 30) {
-        slideRotationMotor.setTargetPosition(slideRotationTargetPosition);
-      }
-    } else {
-      slideRotationMotor.setTargetPosition(slideRotationTargetPosition);
-      checkExtentionLimit();
-      slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
-    }
+    slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
+
+    moveSlideRotationPIDF(slideRotationTargetPosition);
+
     myOpMode.telemetry.addData("slideRotationTargetPosition", "end %d", slideRotationTargetPosition);
     myOpMode.telemetry.addData("slideExtensionTargetPosition", "end %d", slideExtensionTargetPosition);
+  }
+
+  public PIDController controller;
+
+  public static double UP_UNEXTENDED_KP = 0.02,   UP_UNEXTENDED_KI = 0.05, UP_UNEXTENDED_KD = 0.0005;
+  public static double DOWN_UNEXTENDED_KP = 0.02, DOWN_UNEXTENDED_KI = 0.01, DOWN_UNEXTENDED_KD = 0.0001;
+  public static double UP_EXTENDED_KP = 0.04,     UP_EXTENDED_KI = 0.05, UP_EXTENDED_KD = 0.00;
+  public static double DOWN_EXTENDED_KP = 0.04,   DOWN_EXTENDED_KI = 0.01, DOWN_EXTENDED_KD = 0.00;
+  public static double UNEXTENDED_KCOS = 0.12;
+  public static double EXTENDED_KCOS = 0.35;
+
+  public double Kp = 0.02, Ki = 0.05, Kd = 0.0005;
+
+  public double interpolation;
+
+  private final double ticks_in_degree = 3895.9 / 360;
+
+  int armPos;
+  double ffOutput;
+  double pidOutput;
+  double power;
+
+  public void moveSlideRotationPIDF(double target) {
+    armPos = slideRotationMotor.getCurrentPosition();
+
+    interpolation = 1 - (slideExtensionMotor.getCurrentPosition() / 3060.0);
+/*
+    Kp = target > armPos ? DOWN_UNEXTENDED_KP * interpolation + DOWN_EXTENDED_KP * (1 - interpolation) : UP_UNEXTENDED_KP * interpolation + UP_EXTENDED_KP * (1 - interpolation);
+    Ki = target > armPos ? DOWN_UNEXTENDED_KI * interpolation + DOWN_EXTENDED_KI * (1 - interpolation) : UP_UNEXTENDED_KI * interpolation + UP_EXTENDED_KI * (1 - interpolation);
+    Kd = target > armPos ? DOWN_UNEXTENDED_KD * interpolation + DOWN_EXTENDED_KD * (1 - interpolation) : UP_UNEXTENDED_KD * interpolation + UP_EXTENDED_KD * (1 - interpolation);
+
+
+ */
+    Kp = UP_UNEXTENDED_KP;
+    Ki = UP_UNEXTENDED_KI;
+    Kd = UP_UNEXTENDED_KD;
+
+    controller.setPID(Kp, Ki, Kd);
+
+    pidOutput = controller.calculate(armPos, target);
+
+    ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
+
+    power = Math.min(ffOutput + pidOutput, 1);
+
+    slideRotationMotor.setPower(power);
   }
 
   public boolean armReachedTarget() {
@@ -535,7 +604,7 @@ public class Robot {
     return ticks * CONVERT_TICKS_DEGREES_312RPM;
   }
   public void getReadyToHangRobot() {
-    slideRotationMotor.setPower(ARM_ROT_POWER);
+    slideRotationPower = ARM_ROT_POWER;
     slideRotationTargetPosition = ARM_ROT_HANG_ROBOT;
     slideExtensionMotor.setPower(ARM_EXT_POWER);
     slideExtensionTargetPosition = ARM_EXT_HANG_ROBOT;
@@ -572,5 +641,43 @@ public class Robot {
     slideRotationTargetPosition = (int)(rotationOffSet) + ARM_ROT_PICKUP_SAMPLES;
   }
 
+  public boolean sampleToPickUp() {
+    red = colorSensor.red();
+    green = colorSensor.green();
+    blue = colorSensor.blue();
+    alpha = colorSensor.alpha();
+
+    if (red > redValues[0][0] && red < redValues[1][0] && green > redValues[0][1] && green < redValues[1][1] && blue > redValues[0][2] && blue < redValues[1][2]){
+      color = RED;
+    }
+    else if (red > yellowValues[0][0] && red < yellowValues[1][0] && green > yellowValues[0][1] && green < yellowValues[1][1] && blue > yellowValues[0][2] && blue < yellowValues[1][2]){
+      color = YELLOW;
+    }
+    else if (red > blueValues[0][0] && red < blueValues[1][0] && green > blueValues[0][1] && green < blueValues[1][1] && blue > blueValues[0][2] && blue < blueValues[1][2]){
+      color = BLUE;
+    }
+    else {
+      color = UNKNOWN;
+    }
+
+    myOpMode.telemetry.addData("Color", color.toString());
+    myOpMode.telemetry.addData("Red", red);
+    myOpMode.telemetry.addData("Green", green);
+    myOpMode.telemetry.addData("Blue", blue);
+    myOpMode.telemetry.addData("Alpha", alpha);
+
+    if (color == YELLOW) {
+      return true;
+    }
+    else if (color == RED && team == Team.RED) {
+      return true;
+    }
+    else if (color == BLUE && team == Team.BLUE) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }
 

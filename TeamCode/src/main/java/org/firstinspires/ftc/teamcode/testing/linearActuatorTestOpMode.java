@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Linear Acutator Test", group = "zTesting")
 @Disabled
-public class LinearActuatorTestOpMode extends LinearOpMode {
+public class linearActuatorTestOpMode extends LinearOpMode {
 
   // Initialize Variables
 

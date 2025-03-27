@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Hand Control Test", group = "Testing")
-@Disabled
+
 public class HandControlTestOpMode extends LinearOpMode {
   Servo clawGrabServo = null;
 
@@ -29,6 +29,7 @@ public class HandControlTestOpMode extends LinearOpMode {
       if (currentGamepad1.right_bumper && !prevGamepad1.right_bumper) {
         if (clawClosePosition == 0) {
           clawClosePosition = 0.175;
+
         }
         else {
           clawClosePosition = 0;
