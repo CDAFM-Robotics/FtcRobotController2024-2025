@@ -48,8 +48,8 @@ public class Robot {
 
   public static double CLAW_PAN_TELEOP_INIT = 0.65;
   public static double CLAW_PAN_POSITION_DROP_DIP = 0.6; // don't retract slide with this position!!!
-  public static double CLAW_PAN_POSITION_STRAIGHT = 0.225;
-  public static double CLAW_PAN_POSITION_PICKUP_DIP = 0.135;
+  public static double CLAW_PAN_POSITION_STRAIGHT = 0.205;
+  public static double CLAW_PAN_POSITION_PICKUP_DIP = 0.115;
   public static double CLAW_PAN_POSITION_PICKUP_WALL = 0.5450;
   public static double CLAW_PAN_POSITION_AUTO_PICKUP_WALL = 0.5494;
   public static double CLAW_PAN_POSITION_TOP_SPECIMEN = 0.245;
@@ -102,10 +102,10 @@ public class Robot {
   public static int ARM_EXT_AUTO_DROP_TOP_BASKET = 3060;
 
   public static int ARM_ROT_INIT = 0;
-  public static int ARM_ROT_DROP_OFF_SAMPLES = 1560;
-  public static int ARM_ROT_DROP_OFF_SAMPLES_BOTTOM = 1525;
+  public static int ARM_ROT_DROP_OFF_SAMPLES = 1600;
+  public static int ARM_ROT_DROP_OFF_SAMPLES_BOTTOM = 1575;
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
-  public static int ARM_ROT_PICKUP_SAMPLES = 350;
+  public static int ARM_ROT_PICKUP_SAMPLES = 345;
   public static int ARM_ROT_PICKUP_WALL = 297;
   public static int ARM_ROT_AUTO_PICKUP_WALL = 297;
   public static int ARM_ROT_DRIVE = 650;
@@ -307,7 +307,7 @@ public class Robot {
 
   // Get Slide Rotation Motor Target position
   public int getSlideRotationMotorTargetPosition() {
-    return slideRotationMotor.getTargetPosition();
+    return slideRotationTargetPosition;
   }
 
   // Get Slide Rotation Motor Current position
@@ -465,6 +465,7 @@ public class Robot {
 
   }
 
+  // TODO: check soft limit need to be fixed. drop top basket macro doesn't work with limit
   public void checkExtentionLimit () {
     // check limit
     checkSoftLimits(convertTicksToDegrees312RPM(slideExtensionMotor.getCurrentPosition()) * Robot.CONVERT_DEGREES_INCHES_SLIDE,
@@ -485,7 +486,7 @@ public class Robot {
     if (slideExtensionTargetPosition > slideExtensionMotor.getCurrentPosition()) {
       moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
       if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 50) {
-        checkExtentionLimit();
+        //checkExtentionLimit();
         slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
       }
     } else if (slideExtensionTargetPosition < slideExtensionMotor.getCurrentPosition()) {
@@ -495,7 +496,7 @@ public class Robot {
       }
     } else {
       moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
-      checkExtentionLimit();
+      //checkExtentionLimit();
       slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
     }
   }
@@ -538,7 +539,7 @@ public class Robot {
 
     pidOutput = controller.calculate(armPos, target);
 
-    ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
+    ffOutput = Math.cos(Math.toRadians(slideRotationMotor.getCurrentPosition() / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
 
     // power = Math.max(Math.min(pidOutput, 1), - 2 * (1 - ffOutput)) * powerMult + ffOutput;      // todo TRY a partial scalar
     power = pidOutput*Math.min((Math.abs(powerMult)+0.0),1)+ffOutput; // todo kinda works but inverse dip at lower powers
@@ -549,13 +550,14 @@ public class Robot {
     myOpMode.telemetry.addData("Kp", "%f", Kp);
     myOpMode.telemetry.addData("Ki", "%f", Ki);
     myOpMode.telemetry.addData("Kd", "%f", Kd);
-    myOpMode.telemetry.addData("power", "%f", power);
+    myOpMode.telemetry.addData("pidOutput", "%f", pidOutput);
+    myOpMode.telemetry.addData("ffoutput", "%f", ffOutput);
     myOpMode.telemetry.addData("power mult", powerMult);
   }
 
   public boolean armReachedTarget() {
-    if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 10
-            && Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 10)
+    if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 20
+            && Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 20)
       return true;
     else
       return false;
@@ -673,7 +675,6 @@ public class Robot {
     else {
 
     }
-
   }
 
   public Color readColor () {
