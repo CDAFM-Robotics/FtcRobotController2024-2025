@@ -484,7 +484,7 @@ public class Robot {
   public void moveArmToPosition() {
     if (slideExtensionTargetPosition > slideExtensionMotor.getCurrentPosition()) {
       moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
-      if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 10) {
+      if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 50) {
         checkExtentionLimit();
         slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
       }
@@ -509,7 +509,7 @@ public class Robot {
   public static double UNEXTENDED_KCOS = 0.12;
   public static double EXTENDED_KCOS = 0.35;
 
-  public double Kp = 0.02, Ki = 0.05, Kd = 0.0005;
+  public double Kp = 0.003, Ki = 0.02, Kd = 0.0005;
 
 
   public double interpolation;
@@ -532,13 +532,18 @@ public class Robot {
 
  */
 
+    // Kp = Kp * powerMult; // TODO this didn't work
+
     controller.setPID(Kp, Ki, Kd);
 
     pidOutput = controller.calculate(armPos, target);
 
     ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
 
-    power = Math.max(Math.min(pidOutput, 1), - 2 * (1 - ffOutput)) * powerMult + ffOutput;
+    // power = Math.max(Math.min(pidOutput, 1), - 2 * (1 - ffOutput)) * powerMult + ffOutput;      // todo TRY a partial scalar
+    power = pidOutput*Math.min((Math.abs(powerMult)+0.0),1)+ffOutput; // todo kinda works but inverse dip at lower powers
+    // power = pidOutput + ffOutput;
+
 
     slideRotationMotor.setPower(power);
     myOpMode.telemetry.addData("Kp", "%f", Kp);

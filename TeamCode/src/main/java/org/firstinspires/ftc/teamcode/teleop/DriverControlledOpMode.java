@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.common.Robot;
 
 @TeleOp(name = "Driver Control TeleOp", group = "0competition")
+@Config
 public class DriverControlledOpMode extends LinearOpMode {
   // Define all the states for the arm and hand
   public enum ArmHandState {
@@ -61,10 +63,10 @@ public class DriverControlledOpMode extends LinearOpMode {
     // Initialize the arm and hand state
     armHandState = ArmHandState.ROT_ARM_HOLD;
 
-    telemetry.addData("Status", "Initialized");
-    telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
-    telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
-    telemetry.update();
+//    telemetry.addData("Status", "Initialized");
+//    telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
+//    telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
+//    telemetry.update();
 
     while (opModeInInit()) {
       robot.team = Robot.Team.RED;
@@ -377,16 +379,16 @@ public class DriverControlledOpMode extends LinearOpMode {
       robot.moveHandToPosition();
       robot.moveArmToPosition();
 
-      telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
-      telemetry.addData("Rotation Motor ", "power: %f, p per cycle: %d", robot.slideRotationMotor.getPower(), tickPerCycle);
-      telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
-      telemetry.addData("Extension Motor ", "power: %f", robot.slideExtensionMotor.getPower());
-      telemetry.addData("Fingers servo ", "position %f", robot.clawGrabServo.getPosition());
-      telemetry.addData("pan servo ", "position %f", robot.clawPanServo.getPosition());
-      telemetry.addData("rotation servo ", "position %f", robot.clawRotateServo.getPosition());
-      telemetry.addLine(armHandState.toString());
-
-      telemetry.update();
+//      telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
+//      telemetry.addData("Rotation Motor ", "power: %f, p per cycle: %d", robot.slideRotationMotor.getPower(), tickPerCycle);
+//      telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
+//      telemetry.addData("Extension Motor ", "power: %f", robot.slideExtensionMotor.getPower());
+//      telemetry.addData("Fingers servo ", "position %f", robot.clawGrabServo.getPosition());
+//      telemetry.addData("pan servo ", "position %f", robot.clawPanServo.getPosition());
+//      telemetry.addData("rotation servo ", "position %f", robot.clawRotateServo.getPosition());
+//      telemetry.addLine(armHandState.toString());
+//
+//      telemetry.update();
       }
   }
 }
