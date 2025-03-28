@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.common.Robot;
 public class DriverControlledOpMode extends LinearOpMode {
   // Define all the states for the arm and hand
   public enum ArmHandState {
-    ARM_HOLD,
-    DRIVER_CONTROL,
+    ROT_ARM_HOLD,
+    ROT_DRIVER_CONTROL,
     ARM_PICKUP,
     HAND_PICKUP_SEQ,
     HAND_PICKUP_SEQ_1,
@@ -59,7 +59,7 @@ public class DriverControlledOpMode extends LinearOpMode {
     robot.initializeDevices();
 
     // Initialize the arm and hand state
-    armHandState = ArmHandState.ARM_HOLD;
+    armHandState = ArmHandState.ROT_ARM_HOLD;
 
     telemetry.addData("Status", "Initialized");
     telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
@@ -99,51 +99,36 @@ public class DriverControlledOpMode extends LinearOpMode {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
         robot.setSlideRotationMotorTargetPosition(Robot.ARM_ROT_DROP_OFF_SAMPLES);
         prevArmHandState = armHandState;
-        armHandState = ArmHandState.DRIVER_CONTROL;
+        armHandState = ArmHandState.ROT_DRIVER_CONTROL;
       }
       else if (currentGamepad2.left_stick_y > 0) {
         robot.setSlideRotationMotorPower(Math.pow(currentGamepad2.left_stick_y,2));
-        robot.setSlideRotationMotorTargetPosition(-500);
+        robot.setSlideRotationMotorTargetPosition(Robot.ARM_ROT_INIT);
         prevArmHandState = armHandState;
-        armHandState = ArmHandState.DRIVER_CONTROL;
+        armHandState = ArmHandState.ROT_DRIVER_CONTROL;
       }
       else {
         if (currentGamepad2.left_stick_y == 0 && previousGamepad2.left_stick_y != 0 ) {
           robot.setSlideRotationMotorPower(Robot.ARM_ROT_POWER_FULL);
           robot.setSlideRotationMotorTargetPosition(robot.getSlideRotationMotorCurrentPosition());
           prevArmHandState = armHandState;
-          armHandState = ArmHandState.ARM_HOLD;
+          armHandState = ArmHandState.ROT_ARM_HOLD;
         }
       }
 
       // Driver Arm Extension Control
       if (currentGamepad2.right_stick_y < 0) {
         robot.setSlideExtensionMotorPower(currentGamepad2.right_stick_y * Math.pow(currentGamepad2.right_stick_y,2));
-        if (robot.isArmPickup()) {
-          robot.setRotationTargetForPickUp();
-          robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_PICKUP_SAMPLES_EXT);
-        }
-        else {
-          robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_DROP_TOP_BASKET);
-        }
-        prevArmHandState = armHandState;
-        armHandState = ArmHandState.DRIVER_CONTROL;
+        robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_DROP_TOP_BASKET);
       }
       else if (currentGamepad2.right_stick_y > 0) {
         robot.setSlideExtensionMotorPower(currentGamepad2.right_stick_y * Math.pow(currentGamepad2.right_stick_y,2));
-        if (robot.isArmPickup()) {
-          robot.setRotationTargetForPickUp();
-        }
         robot.setSlideExtensionMotorTargetPosition(Robot.ARM_EXT_INIT);
-        prevArmHandState = armHandState;
-        armHandState = ArmHandState.DRIVER_CONTROL;
       }
       else {
         if (currentGamepad2.right_stick_y == 0 && previousGamepad2.right_stick_y != 0) {
           robot.setSlideExtensionMotorPower(Robot.ARM_EXT_POWER);
           robot.setSlideExtensionMotorTargetPosition(robot.getSlideExtensionMotorCurrentPosition());
-          prevArmHandState = armHandState;
-          armHandState = ArmHandState.ARM_HOLD;
         }
       }
 
@@ -155,7 +140,32 @@ public class DriverControlledOpMode extends LinearOpMode {
         robot.toggleClawGrabPosition();
       }
 
-      boolean sampleToPickup = robot.sampleToPickUp();
+      // Wrist joint move up 0
+      if (currentGamepad2.b && !previousGamepad2.b) {
+        robot.clawPanServoUp();
+      }
+
+      // Wrist joint move down
+      if (currentGamepad2.a && !previousGamepad2.a) {
+        robot.clawPanServoDown();
+      }
+      // Wrist joint rotate left
+      if (currentGamepad2.x && !previousGamepad2.x) {
+        robot.clawRotateServoLeft();
+      }
+
+      // Wrist joint rotate right
+      if (currentGamepad2.y && !previousGamepad2.y) {
+        robot.clawRotateServoRight();
+      }
+
+      // Turn wrist joint by 90 degrees
+      if (currentGamepad2.start && !previousGamepad2.start) {
+        robot.toggleClawRotation();
+      }
+
+      // automatic pick up
+/*    boolean sampleToPickup = robot.sampleToPickUp();
 
       if (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN && robot.isArmPickup() &&
         (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
@@ -206,36 +216,12 @@ public class DriverControlledOpMode extends LinearOpMode {
             break;
         }
       }
-
-      // Wrist joint move up 0
-      if (currentGamepad2.b && !previousGamepad2.b) {
-        robot.clawPanServoUp();
-      }
-
-      // Wrist joint move down
-      if (currentGamepad2.a && !previousGamepad2.a) {
-        robot.clawPanServoDown();
-      }
-      // Wrist joint rotate left
-      if (currentGamepad2.x && !previousGamepad2.x) {
-        robot.clawRotateServoLeft();
-      }
-
-      // Wrist joint rotate right
-      if (currentGamepad2.y && !previousGamepad2.y) {
-        robot.clawRotateServoRight();
-      }
-
-      // Turn wrist joint by 90 degrees
-      if (currentGamepad2.start && !previousGamepad2.start) {
-        robot.toggleClawRotation();
-      }
-
+*/
       /*************************
        *       Macros          *
        *************************/
       // set the arm at pick up position
-      if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
+/*      if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper) {
         prevArmHandState = armHandState;
         armHandState = ArmHandState.ARM_PICKUP;
         robot.pickupPosition();
@@ -274,9 +260,8 @@ public class DriverControlledOpMode extends LinearOpMode {
         armHandState = ArmHandState.ARM_HAND_DRIVE;
       }
 
+      // geting ready to hang the robot
       if (hangTimer.seconds() >= 90) {
-
-        // get ready to hang the robot
         if (currentGamepad1.y && !previousGamepad1.y) {
           robot.getReadyToHangRobot();
         }
@@ -285,16 +270,23 @@ public class DriverControlledOpMode extends LinearOpMode {
         if (currentGamepad1.x && !previousGamepad1.x) {
           robot.HangRobot();
         }
-      }
+      }*/
 
+      //check to see if the if the pick up position if at the right height
+/*      switch (armHandState) {
+        case ARM_PICKUP:
+          robot.setPickUpHeight();
+        default:
+      }
+*/
       /*********************************************************
        *  move the arm and hand according to target positions  *
        *********************************************************/
-      telemetry.addLine(armHandState.toString());
+/*      telemetry.addLine(armHandState.toString());
       telemetry.addData("Fingers servo ", "position %f", robot.clawGrabServo.getPosition());
       telemetry.addData("pan servo ", "position %f", robot.clawPanServo.getPosition());
-
-      switch (armHandState) {
+*/
+      /*switch (armHandState) {
         case HAND_PICKUP_SEQ:
           if (!robot.isFingersOpen()) {
             robot.openFingers();
@@ -379,7 +371,11 @@ public class DriverControlledOpMode extends LinearOpMode {
           robot.moveHandToPosition();
           robot.moveArmToPosition();
           break;
-      }
+      }*/
+
+      //temp test
+      robot.moveHandToPosition();
+      robot.moveArmToPosition();
 
       telemetry.addData("Rotation Motor ", "Target: %d, Current: %d", robot.getSlideRotationMotorTargetPosition(), robot.getSlideRotationMotorCurrentPosition());
       telemetry.addData("Rotation Motor ", "power: %f, p per cycle: %d", robot.slideRotationMotor.getPower(), tickPerCycle);

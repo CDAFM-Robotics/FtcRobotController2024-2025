@@ -3,12 +3,16 @@ package org.firstinspires.ftc.teamcode.common;
 import static org.firstinspires.ftc.teamcode.common.Robot.Color.*;
 
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Robot {
 
@@ -163,7 +167,7 @@ public class Robot {
   double clawRotatePosition = CLAW_ROTATE_POSITION_STRAIGHT;
   double driveSpeed = DRIVE_TRAIN_SPEED_FAST;
 
-  ColorSensor colorSensor = null;
+  RevColorSensorV3 colorSensor = null;
 
   int red;
   int green;
@@ -218,13 +222,13 @@ public class Robot {
     clawPanServo = myOpMode.hardwareMap.get(Servo.class, "clawPanServo");
     clawRotateServo = myOpMode.hardwareMap.get(Servo.class, "clawRotateServo");
 
-    colorSensor = myOpMode.hardwareMap.get(ColorSensor.class, "colorSensor");
+    colorSensor = myOpMode.hardwareMap.get(RevColorSensorV3.class, "colorSensor");
 
     slideRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-    slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    slideRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    //slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    //slideRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-    controller = new PIDController(0, 0, 0);
+    controller = new PIDController(UP_UNEXTENDED_KP, UP_UNEXTENDED_KI, UP_UNEXTENDED_KD);
 
     slideExtensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     slideExtensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -474,17 +478,26 @@ public class Robot {
       slideExtensionTargetPosition = ARM_EXT_DROP_TOP_BASKET;
     else if (slideExtensionTargetPosition < ARM_EXT_INIT)
       slideExtensionTargetPosition = ARM_EXT_INIT;
-
   }
+
+  // Target position has been set, now move the arm to position
   public void moveArmToPosition() {
-    myOpMode.telemetry.addData("slideRotationTargetPosition", "start %d", slideRotationTargetPosition);
-    myOpMode.telemetry.addData("slideExtensionTargetPosition", "start %d", slideExtensionTargetPosition);
-    slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
-
-    moveSlideRotationPIDF(slideRotationTargetPosition);
-
-    myOpMode.telemetry.addData("slideRotationTargetPosition", "end %d", slideRotationTargetPosition);
-    myOpMode.telemetry.addData("slideExtensionTargetPosition", "end %d", slideExtensionTargetPosition);
+    if (slideExtensionTargetPosition > slideExtensionMotor.getCurrentPosition()) {
+      moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
+      if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 10) {
+        checkExtentionLimit();
+        slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
+      }
+    } else if (slideExtensionTargetPosition < slideExtensionMotor.getCurrentPosition()) {
+      slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
+      if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 30) {
+        moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
+      }
+    } else {
+      moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
+      checkExtentionLimit();
+      slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
+    }
   }
 
   public PIDController controller;
@@ -498,6 +511,7 @@ public class Robot {
 
   public double Kp = 0.02, Ki = 0.05, Kd = 0.0005;
 
+
   public double interpolation;
 
   private final double ticks_in_degree = 3895.9 / 360;
@@ -507,20 +521,16 @@ public class Robot {
   double pidOutput;
   double power;
 
-  public void moveSlideRotationPIDF(double target) {
+  public void moveSlideRotationPIDF(double target, double powerMult) {
     armPos = slideRotationMotor.getCurrentPosition();
+    //interpolation = 1 - (slideExtensionMotor.getCurrentPosition() / 3060.0);
 
-    interpolation = 1 - (slideExtensionMotor.getCurrentPosition() / 3060.0);
 /*
     Kp = target > armPos ? DOWN_UNEXTENDED_KP * interpolation + DOWN_EXTENDED_KP * (1 - interpolation) : UP_UNEXTENDED_KP * interpolation + UP_EXTENDED_KP * (1 - interpolation);
     Ki = target > armPos ? DOWN_UNEXTENDED_KI * interpolation + DOWN_EXTENDED_KI * (1 - interpolation) : UP_UNEXTENDED_KI * interpolation + UP_EXTENDED_KI * (1 - interpolation);
     Kd = target > armPos ? DOWN_UNEXTENDED_KD * interpolation + DOWN_EXTENDED_KD * (1 - interpolation) : UP_UNEXTENDED_KD * interpolation + UP_EXTENDED_KD * (1 - interpolation);
 
-
  */
-    Kp = UP_UNEXTENDED_KP;
-    Ki = UP_UNEXTENDED_KI;
-    Kd = UP_UNEXTENDED_KD;
 
     controller.setPID(Kp, Ki, Kd);
 
@@ -528,9 +538,14 @@ public class Robot {
 
     ffOutput = Math.cos(Math.toRadians(target / ticks_in_degree - 17)) * UNEXTENDED_KCOS;
 
-    power = Math.min(ffOutput + pidOutput, 1);
+    power = Math.max(Math.min(pidOutput, 1), - 2 * (1 - ffOutput)) * powerMult + ffOutput;
 
     slideRotationMotor.setPower(power);
+    myOpMode.telemetry.addData("Kp", "%f", Kp);
+    myOpMode.telemetry.addData("Ki", "%f", Ki);
+    myOpMode.telemetry.addData("Kd", "%f", Kd);
+    myOpMode.telemetry.addData("power", "%f", power);
+    myOpMode.telemetry.addData("power mult", powerMult);
   }
 
   public boolean armReachedTarget() {
@@ -639,6 +654,42 @@ public class Robot {
     double a = (105.0/1661.0);
     double rotationOffSet = a * slideExtensionMotor.getCurrentPosition();
     slideRotationTargetPosition = (int)(rotationOffSet) + ARM_ROT_PICKUP_SAMPLES;
+  }
+
+  // correct pickup height
+  public void setPickUpHeight (){
+    Color sensedColor = readColor();
+    double distance = colorSensor.getDistance(DistanceUnit.INCH);
+    myOpMode.telemetry.addData("Color", color.toString());
+    myOpMode.telemetry.addData("distance","%f",distance);
+    if ( sensedColor == RED || sensedColor == BLUE || sensedColor == YELLOW ) {
+      //slideRotationTargetPosition +=
+    }
+    else {
+
+    }
+
+  }
+
+  public Color readColor () {
+    red = colorSensor.red();
+    green = colorSensor.green();
+    blue = colorSensor.blue();
+    alpha = colorSensor.alpha();
+
+    if (red > redValues[0][0] && red < redValues[1][0] && green > redValues[0][1] && green < redValues[1][1] && blue > redValues[0][2] && blue < redValues[1][2]){
+      color = RED;
+    }
+    else if (red > yellowValues[0][0] && red < yellowValues[1][0] && green > yellowValues[0][1] && green < yellowValues[1][1] && blue > yellowValues[0][2] && blue < yellowValues[1][2]){
+      color = YELLOW;
+    }
+    else if (red > blueValues[0][0] && red < blueValues[1][0] && green > blueValues[0][1] && green < blueValues[1][1] && blue > blueValues[0][2] && blue < blueValues[1][2]){
+      color = BLUE;
+    }
+    else {
+      color = UNKNOWN;
+    }
+    return color;
   }
 
   public boolean sampleToPickUp() {
