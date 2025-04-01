@@ -32,13 +32,13 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     rrTrajectories.initTrajectories();
     trajectories = rrTrajectories.getRightSideTrajectories();
 
-
     waitForStart();
 
     // HANG FIRST (HELD) SPECIMEN
     robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_HANG);
     robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG);
     robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_HANG);
+    // sleep(200);
 
     Actions.runBlocking(rrTrajectories.rightStartToBar);
 
@@ -68,10 +68,18 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar);
 
-
-
+    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 215) {
+      rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.leftBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+    }
+    rrTrajectories.drive.rightFront.setPower(0);
+    rrTrajectories.drive.leftFront.setPower(0);
+    rrTrajectories.drive.rightBack.setPower(0);
+    rrTrajectories.drive.leftBack.setPower(0);
     robot.slideExtensionMotor.setPower(1.0); // TODO FULL SPEED RETRACT
-    robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG_PULL); // TODO
+    robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG_PULL);
     sleep(550);
 
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_OPEN);
@@ -84,8 +92,6 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.barToSpecimenWallPos);
 
-
-
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
     sleep(400);
 
@@ -96,6 +102,16 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar2);
 
+    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 215) {
+      rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+      rrTrajectories.drive.leftBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+    }
+    rrTrajectories.drive.rightFront.setPower(0);
+    rrTrajectories.drive.leftFront.setPower(0);
+    rrTrajectories.drive.rightBack.setPower(0);
+    rrTrajectories.drive.leftBack.setPower(0);
 
     robot.slideExtensionMotor.setPower(1.0); // TODO: FULL SPEED RETRACT
     robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG_PULL);

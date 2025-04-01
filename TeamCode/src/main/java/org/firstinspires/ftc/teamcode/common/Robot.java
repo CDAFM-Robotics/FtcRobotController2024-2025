@@ -10,6 +10,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,6 +30,10 @@ public class Robot {
   public Servo clawGrabServo = null;
   public Servo clawPanServo = null;
   public Servo clawRotateServo = null;
+
+  public DistanceSensor distanceSensorLeft = null;
+  public DistanceSensor distanceSensorRight = null;
+
 
   LinearOpMode myOpMode;
 
@@ -121,6 +126,7 @@ public class Robot {
   public static double ARM_EXT_POWER_AUTO = 0.38;
   public static double DRIVE_TRAIN_SPEED_FAST = 1;
   public static double DRIVE_TRAIN_SPEED_SLOW = 1.0 / 3.0;
+  public static double DRIVE_TRAIN_SPEED_AUTO_TO_BAR = 0.3;
 
   public static double LENGTH_CLAW = 7;
   public static double LENGTH_INSPECTION_FRONT = 35;
@@ -166,8 +172,6 @@ public class Robot {
   double clawPanPosition = CLAW_PAN_TELEOP_INIT;
   double clawRotatePosition = CLAW_ROTATE_POSITION_STRAIGHT;
   double driveSpeed = DRIVE_TRAIN_SPEED_FAST;
-
-  RevColorSensorV3 colorSensor = null;
 
   int red;
   int green;
@@ -222,8 +226,6 @@ public class Robot {
     clawPanServo = myOpMode.hardwareMap.get(Servo.class, "clawPanServo");
     clawRotateServo = myOpMode.hardwareMap.get(Servo.class, "clawRotateServo");
 
-    colorSensor = myOpMode.hardwareMap.get(RevColorSensorV3.class, "colorSensor");
-
     slideRotationMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     //slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     //slideRotationMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -240,6 +242,9 @@ public class Robot {
     clawPanServo.setPosition(CLAW_PAN_TELEOP_INIT);
     clawRotateServo.setPosition(CLAW_ROTATE_POSITION_STRAIGHT);
     clawGrabServo.setPosition(CLAW_GRAB_POSITION_CLOSED);
+
+    distanceSensorLeft = myOpMode.hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
+    distanceSensorRight = myOpMode.hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
   }
 
   public void setMotorPowers(double x, double y, double rx, double heading, double speed) {
@@ -665,18 +670,9 @@ public class Robot {
 
   // correct pickup height
   public void setPickUpHeight (){
-    Color sensedColor = readColor();
-    double distance = colorSensor.getDistance(DistanceUnit.INCH);
-    myOpMode.telemetry.addData("Color", color.toString());
-    myOpMode.telemetry.addData("distance","%f",distance);
-    if ( sensedColor == RED || sensedColor == BLUE || sensedColor == YELLOW ) {
-      //slideRotationTargetPosition +=
-    }
-    else {
-
-    }
+  //  Color sensedColor = readColor();
   }
-
+/*
   public Color readColor () {
     red = colorSensor.red();
     green = colorSensor.green();
@@ -696,6 +692,37 @@ public class Robot {
       color = UNKNOWN;
     }
     return color;
+  }
+
+ */
+
+  public double getLeftDistance() {
+    return distanceSensorLeft.getDistance(DistanceUnit.MM);
+  }
+  public double getRightDistance() {
+    return distanceSensorRight.getDistance(DistanceUnit.MM);
+  }
+
+  double prevAverageDist = 0;
+  public double getAverageDistance() {
+    double left = getLeftDistance();
+    double right = getRightDistance();
+    double average = (left + right) / 2;
+    double averageFinal;
+    if (Math.abs(average - prevAverageDist) < 30) {
+      averageFinal =  average;
+    }
+    else if (Math.abs(right - prevAverageDist) < 30) {
+      averageFinal =  right;
+    }
+    else if (Math.abs(left - prevAverageDist) < 30) {
+      averageFinal =  left;
+    }
+    else {
+      averageFinal =  average;
+    }
+    prevAverageDist = averageFinal;
+    return averageFinal;
   }
 
 //  public boolean sampleToPickUp() {

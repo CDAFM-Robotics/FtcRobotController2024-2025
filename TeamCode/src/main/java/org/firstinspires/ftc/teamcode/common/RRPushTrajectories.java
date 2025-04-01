@@ -16,7 +16,7 @@ public class RRPushTrajectories {
 
   HardwareMap myHardwareMap;
 
-  MecanumDrive drive;
+   public MecanumDrive drive;
 
   // Observation Side
 
@@ -70,20 +70,19 @@ public class RRPushTrajectories {
     // SPEC2 TO BAR
     specimenWallPosToBar = drive.actionBuilder(new Pose2d(48, -61.5, -Math.PI / 2))
       .strafeToSplineHeading(new Vector2d(8, -46.5), Math.PI / 2) // was -38 was 38.2
-      .strafeTo(new Vector2d(8, -40.5))  // TODO try to stop arm hitting bar
       .build();
 
     // BACK TO WALL
     barToSpecimenWallPos = drive.actionBuilder(new Pose2d(8, -40.5, Math.PI / 2)) // TODO was -38.2
       .setTangent(-Math.PI / 2)
       .splineToSplineHeading(new Pose2d(48, -50, -Math.PI / 2), 0)
-      .strafeTo(new Vector2d(48, -59))
+      .strafeTo(new Vector2d(48, -61))
       .build();
 
     // SPEC3 TO BAR
     specimenWallPosToBar2 = drive.actionBuilder(new Pose2d(48, -59, -Math.PI / 2))
       .strafeToSplineHeading(new Vector2d(6, -49.5), Math.PI / 2) // TODO -38 -> -40
-      .strafeTo(new Vector2d(6, -43.5))  // TODO try to stop arm hitting bar
+//      .strafeTo(new Vector2d(6, -43.5))  // TODO try to stop arm hitting bar
       .build();
 
 

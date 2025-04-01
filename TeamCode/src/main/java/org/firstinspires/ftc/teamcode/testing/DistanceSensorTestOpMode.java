@@ -15,32 +15,31 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class DistanceSensorTestOpMode extends LinearOpMode {
 
-    private DistanceSensor distanceSensorLeft;
-    private DistanceSensor distanceSensorRight;
+  DistanceSensor distanceSensorLeft;
+  DistanceSensor distanceSensorRight;
 
-    @SuppressLint("DefaultLocale")
-    @Override
-    public void runOpMode() {
-        distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
-        distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
+  @SuppressLint("DefaultLocale")
+  @Override
+  public void runOpMode() {
+    distanceSensorLeft = hardwareMap.get(DistanceSensor.class, "distanceSensorLeft");
+    distanceSensorRight = hardwareMap.get(DistanceSensor.class, "distanceSensorRight");
 
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+    telemetry.addData("Status", "Initialized");
+    telemetry.update();
 
-        waitForStart();
-        while(opModeIsActive()) {
-            telemetry.addLine("Color Sensor Left:");
-            telemetry.addData("deviceName", distanceSensorLeft.getDeviceName());
-            telemetry.addData("range left", String.format("%.01f mm", distanceSensorLeft.getDistance(DistanceUnit.MM)));
+    waitForStart();
+    while(opModeIsActive()) {
+      telemetry.addLine("Color Sensor Left:");
+      telemetry.addData("deviceName", distanceSensorLeft.getDeviceName());
+      telemetry.addData("range left", String.format("%.01f mm", distanceSensorLeft.getDistance(DistanceUnit.MM)));
 
-            telemetry.addLine("");
+      telemetry.addLine("");
 
-            telemetry.addLine("Color Sensor Right:");
-            telemetry.addData("range right", String.format("%.01f mm", distanceSensorRight.getDistance(DistanceUnit.MM)));
-            telemetry.update();
-        }
+      telemetry.addLine("Color Sensor Right:");
+      telemetry.addData("range right", String.format("%.01f mm", distanceSensorRight.getDistance(DistanceUnit.MM)));
+      telemetry.update();
     }
-
+  }
 }
