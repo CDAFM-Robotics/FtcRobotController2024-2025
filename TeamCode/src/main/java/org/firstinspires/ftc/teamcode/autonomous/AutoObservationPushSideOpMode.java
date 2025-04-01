@@ -4,9 +4,9 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.common.RRPushTrajectories;
-import org.firstinspires.ftc.teamcode.common.RRTrajectories;
 import org.firstinspires.ftc.teamcode.common.Robot;
 
 @Autonomous(name = "Observation Zone Push Autonomous", group = "Testing")
@@ -23,6 +23,10 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     rrTrajectories = new RRPushTrajectories(this.hardwareMap);
 
     robot.initializeArmDevices();
+    robot.slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    robot.slideRotationMotor.setTargetPosition(0);
+    robot.slideRotationMotor.setPower(1);
+    robot.slideRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     //robot.slideExtensionMotor.setPower(Robot.ARM_EXT_POWER_AUTO);
     robot.slideExtensionMotor.setPower(1);
     rrTrajectories.initTrajectories();
@@ -38,7 +42,7 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.rightStartToBar);
 
-    robot.slideExtensionMotor.setPower(1.0); // TODO FULL SPEED RETRACT ON HANGPULL
+    robot.slideExtensionMotor.setPower(1.0); // TODO FULL SPEED RETRACT ON HANG PULL
     robot.slideExtensionMotor.setTargetPosition(Robot.ARM_EXT_AUTO_HANG_PULL);
     sleep(550);
 
@@ -53,8 +57,6 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     // GO TO WALL
     Actions.runBlocking(rrTrajectories.barToObservationZoneAnd3Samples);
-
-
 
     robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
     sleep(400);
@@ -113,24 +115,5 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     robot.slideRotationMotor.setTargetPosition(0);
 
     sleep(5000);
-
-
-
-  }
-
-  public void pickUpSampleAuto() {
-    robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_PICKUP);
-    robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_PICKUP);
-
-    sleep(250);
-
-    robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
-
-    sleep(500);
-
-    robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_DRIVE);
-
-    sleep(250);
-
   }
 }

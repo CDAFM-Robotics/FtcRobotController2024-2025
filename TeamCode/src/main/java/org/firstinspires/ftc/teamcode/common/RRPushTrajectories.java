@@ -22,14 +22,9 @@ public class RRPushTrajectories {
 
   public Action rightStartToBar;
   public Action barToObservationZoneAnd3Samples;
-  public Action observationZoneToSpecimenWallPos;
   public Action specimenWallPosToBar;
   public Action barToSpecimenWallPos;
   public Action specimenWallPosToBar2;
-  public Action barToSpecimenWallPos2;
-  public Action specimenWallPosToBar3;
-  public Action barToSpecimenWallPos3;
-  public Action specimenWallPosToBar4;
   public Action barToParkCorner;
 
 
@@ -37,14 +32,6 @@ public class RRPushTrajectories {
 
   // Sample Side
 
-  public Action leftStartToNet;
-  public Action netToFirstYellowSample;
-  public Action firstYellowSampleToNet;
-  public Action netToSecondYellowSample;
-  public Action secondYellowSampleToNet;
-  public Action netToThirdYellowSampleWall;
-  public Action thirdYellowSampleWallToNet;
-  public Action netToAscentZone;
 
   public Action[] leftSideTrajectories;
 
@@ -67,12 +54,12 @@ public class RRPushTrajectories {
             // TODO 28 speed constraint on trajectory
       .splineToConstantHeading(new Vector2d(35, -34), Math.PI / 2, new TranslationalVelConstraint(20)) //x:40 was -24
       .splineToConstantHeading(new Vector2d(40, -15), 0, new TranslationalVelConstraint(20))
-      .splineToConstantHeading(new Vector2d(51, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
-      .splineToConstantHeading(new Vector2d(51, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
+      .splineToConstantHeading(new Vector2d(48, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(48, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
       .splineToConstantHeading(new Vector2d(43, -24), Math.PI / 2, new TranslationalVelConstraint(20))
       .splineToConstantHeading(new Vector2d(50, -15), 0, new TranslationalVelConstraint(20))
-      .splineToConstantHeading(new Vector2d(61, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
-      .splineToConstantHeading(new Vector2d(61, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
+      .splineToConstantHeading(new Vector2d(59, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+      .splineToConstantHeading(new Vector2d(59, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
             // TODO ------------- position for wall approach
       .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO
       // -63 -> -62 // was -50 moved forward to hopefully not hit sample on spin.
@@ -83,18 +70,18 @@ public class RRPushTrajectories {
     // SPEC2 TO BAR
     specimenWallPosToBar = drive.actionBuilder(new Pose2d(48, -61.5, -Math.PI / 2))
       .strafeToSplineHeading(new Vector2d(8, -46.5), Math.PI / 2) // was -38 was 38.2
-      .strafeTo(new Vector2d(8, -41))  // TODO try to stop arm hitting bar
+      .strafeTo(new Vector2d(8, -40.5))  // TODO try to stop arm hitting bar
       .build();
 
     // BACK TO WALL
-    barToSpecimenWallPos = drive.actionBuilder(new Pose2d(8, -41, Math.PI / 2)) // TODO was -38.2
+    barToSpecimenWallPos = drive.actionBuilder(new Pose2d(8, -40.5, Math.PI / 2)) // TODO was -38.2
       .setTangent(-Math.PI / 2)
       .splineToSplineHeading(new Pose2d(48, -50, -Math.PI / 2), 0)
-      .strafeTo(new Vector2d(48, -62))
+      .strafeTo(new Vector2d(48, -59))
       .build();
 
     // SPEC3 TO BAR
-    specimenWallPosToBar2 = drive.actionBuilder(new Pose2d(48, -62, -Math.PI / 2))
+    specimenWallPosToBar2 = drive.actionBuilder(new Pose2d(48, -59, -Math.PI / 2))
       .strafeToSplineHeading(new Vector2d(6, -49.5), Math.PI / 2) // TODO -38 -> -40
       .strafeTo(new Vector2d(6, -43.5))  // TODO try to stop arm hitting bar
       .build();
@@ -153,9 +140,5 @@ public class RRPushTrajectories {
   public Action[] getRightSideTrajectories() {
     return rightSideTrajectories;
   }
-  public Action[] getLeftSideTrajectories() {
-    return leftSideTrajectories;
-  }
-
 
 }

@@ -68,8 +68,15 @@ public class DriverControlledOpMode extends LinearOpMode {
     telemetry.addData("Extension Motor ", "Target: %s, Current: %d", robot.getSlideExtensionMotorTargetPosition(), robot.getSlideExtensionMotorCurrentPosition());
     telemetry.update();
 
+    robot.team = Robot.Team.RED;
+
     while (opModeInInit()) {
-      robot.team = Robot.Team.RED;
+      if (gamepad1.b) {
+        robot.team = Robot.Team.RED;
+      }
+      if (gamepad1.x) {
+        robot.team = Robot.Team.BLUE;
+      }
     }
 
     waitForStart();
@@ -121,7 +128,8 @@ public class DriverControlledOpMode extends LinearOpMode {
       // Driver Arm Extension Control
       if (currentGamepad2.right_stick_y < 0) {
         robot.setSlideExtensionMotorPower(currentGamepad2.right_stick_y * Math.pow(currentGamepad2.right_stick_y,2));
-        robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_DROP_TOP_BASKET);
+        //robot.setSlideExtMotorTargetPosWithLimit(Robot.ARM_EXT_DROP_TOP_BASKET);
+        robot.setSlideExtensionMotorTargetPosition(Robot.ARM_EXT_DROP_TOP_BASKET);
       }
       else if (currentGamepad2.right_stick_y > 0) {
         robot.setSlideExtensionMotorPower(currentGamepad2.right_stick_y * Math.pow(currentGamepad2.right_stick_y,2));
@@ -167,16 +175,16 @@ public class DriverControlledOpMode extends LinearOpMode {
       }
 
       // automatic pick up
-/*    boolean sampleToPickup = robot.sampleToPickUp();
+      //boolean sampleToPickup = false; //robot.sampleToPickUp();
 
-      if (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN && robot.isArmPickup() &&
-        (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
-          armHandState != ArmHandState.HAND_PICKUP_SEQ_1 &&
-          armHandState != ArmHandState.HAND_PICKUP_SEQ_2 &&
-          armHandState != ArmHandState.HAND_PICKUP_SEQ_3)) {
-        prevArmHandState = armHandState;
-        armHandState = ArmHandState.ARM_PICKUP;
-      }
+//      if (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN && robot.isArmPickup() &&
+//        (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
+//          armHandState != ArmHandState.HAND_PICKUP_SEQ_1 &&
+//          armHandState != ArmHandState.HAND_PICKUP_SEQ_2 &&
+//          armHandState != ArmHandState.HAND_PICKUP_SEQ_3)) {
+//        prevArmHandState = armHandState;
+//        armHandState = ArmHandState.ARM_PICKUP;
+//      }
 
       if (currentGamepad2.right_trigger > 0) {
         if (robot.isArmPickup()) {
@@ -192,11 +200,11 @@ public class DriverControlledOpMode extends LinearOpMode {
           armHandState = ArmHandState.ARM_DROP_READY;
         }
       }
-      if (currentGamepad2.right_trigger > 0 || (sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN &&
+      if (currentGamepad2.right_trigger > 0 /*(sampleToPickup && robot.clawGrabServo.getPosition() == Robot.CLAW_GRAB_POSITION_OPEN &&
         (armHandState != ArmHandState.HAND_PICKUP_SEQ &&
           armHandState != ArmHandState.HAND_PICKUP_SEQ_1 &&
           armHandState != ArmHandState.HAND_PICKUP_SEQ_2 &&
-          armHandState != ArmHandState.HAND_PICKUP_SEQ_3))) {
+          armHandState != ArmHandState.HAND_PICKUP_SEQ_3))*/) {
         switch (armHandState) {
           case ARM_PICKUP:
             prevArmHandState = armHandState;
@@ -218,7 +226,6 @@ public class DriverControlledOpMode extends LinearOpMode {
             break;
         }
       }
-*/
       /*************************
        *       Macros          *
        *************************/
@@ -280,7 +287,7 @@ public class DriverControlledOpMode extends LinearOpMode {
           robot.setPickUpHeight();
         default:
       }
-
+      /*
       // right trigger => pick up or drop off sequence
       if (currentGamepad2.right_trigger > 0 ) {
         switch (armHandState) {
@@ -304,12 +311,15 @@ public class DriverControlledOpMode extends LinearOpMode {
         }
       }
 
+       */
+
 
       /*********************************************************
        *  move the arm and hand according to target positions  *
        *********************************************************/
       switch (armHandState) {
         case HAND_PICKUP_SEQ:
+          robot.moveArmToPosition();
           if (!robot.isFingersOpen()) {
             robot.openFingers();
             prevArmHandState = armHandState;
@@ -323,6 +333,7 @@ public class DriverControlledOpMode extends LinearOpMode {
             break;
           }
         case HAND_PICKUP_SEQ_1:
+          robot.moveArmToPosition();
           if (timer.seconds() > 0.4) {
             robot.handPickUpdip();
             prevArmHandState = armHandState;
@@ -333,6 +344,7 @@ public class DriverControlledOpMode extends LinearOpMode {
             break;
           }
         case HAND_PICKUP_SEQ_2:
+          robot.moveArmToPosition();
           if (timer.seconds() > 0.3) {
             robot.closeFingers();
             prevArmHandState = armHandState;
@@ -343,6 +355,7 @@ public class DriverControlledOpMode extends LinearOpMode {
             break;
           }
         case HAND_PICKUP_SEQ_3:
+          robot.moveArmToPosition();
           if (timer.seconds() > 0.4) {
             robot.handStraight();
             prevArmHandState = armHandState;

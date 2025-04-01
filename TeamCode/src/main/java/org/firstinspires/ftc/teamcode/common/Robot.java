@@ -47,12 +47,12 @@ public class Robot {
   public static double CLAW_ROTATE_POSITION_RIGHT = 0.8375;
 
   public static double CLAW_PAN_TELEOP_INIT = 0.65;
-  public static double CLAW_PAN_POSITION_DROP_DIP = 0.6; // don't retract slide with this position!!!
+  public static double CLAW_PAN_POSITION_DROP_DIP = 0.55; // don't retract slide with this position!!!
   public static double CLAW_PAN_POSITION_STRAIGHT = 0.205;
   public static double CLAW_PAN_POSITION_PICKUP_DIP = 0.115;
   public static double CLAW_PAN_POSITION_PICKUP_WALL = 0.5450;
   public static double CLAW_PAN_POSITION_AUTO_PICKUP_WALL = 0.5494;
-  public static double CLAW_PAN_POSITION_TOP_SPECIMEN = 0.245;
+  public static double CLAW_PAN_POSITION_TOP_SPECIMEN = 0.22;
   public static double CLAW_PAN_POSITION_DRIVE = 0.1994;
   public static double CLAW_PAN_POSITION_HANG_ROBOT = 0.075;
   public static double CLAW_PAN_POSITION_AUTO_HANG = 0.2;
@@ -102,15 +102,15 @@ public class Robot {
   public static int ARM_EXT_AUTO_DROP_TOP_BASKET = 3060;
 
   public static int ARM_ROT_INIT = 0;
-  public static int ARM_ROT_DROP_OFF_SAMPLES = 1600;
+  public static int ARM_ROT_DROP_OFF_SAMPLES = 1550;
   public static int ARM_ROT_DROP_OFF_SAMPLES_BOTTOM = 1575;
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
-  public static int ARM_ROT_PICKUP_SAMPLES = 345;
-  public static int ARM_ROT_PICKUP_WALL = 297;
+  public static int ARM_ROT_PICKUP_SAMPLES = 300;
+  public static int ARM_ROT_PICKUP_WALL = 241;
   public static int ARM_ROT_AUTO_PICKUP_WALL = 297;
   public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
-  public static int ARM_ROT_AUTO_HANG = 1068; //1068; //1160
+  public static int ARM_ROT_AUTO_HANG = 1160; //1068; //1160
   public static int ARM_ROT_AUTO_DROP_OFF_SAMPLES = 1580;
   public static int ARM_ROT_AUTO_DRIVE = 1123;
   public static int ARM_ROT_AUTO_PICKUP = 356;
@@ -124,7 +124,7 @@ public class Robot {
 
   public static double LENGTH_CLAW = 7;
   public static double LENGTH_INSPECTION_FRONT = 35;
-  public static double LENGTH_INSPECTION_BACK = 0;
+  public static double LENGTH_INSPECTION_BACK = 100;
   public static double LENGTH_ARM_EXTENDED = 50;
   public static double LENGTH_ARM_NORMAL = 13.375;
   public static double LIMELIGHT_CAMERA_HEIGHT = 12.5;
@@ -333,7 +333,7 @@ public class Robot {
 
   public void setSlideExtMotorTargetPosWithLimit(int position) {
     checkSoftLimits(convertTicksToDegrees312RPM(slideExtensionMotor.getCurrentPosition()) * Robot.CONVERT_DEGREES_INCHES_SLIDE,
-            (slideRotationMotor.getCurrentPosition() - 327) / 14.6697222222);
+            (armPos - 327) / 14.6697222222);
 
     slideExtensionTargetPosition = convertDegreesToTicks312RPM((maxExtension - LENGTH_ARM_NORMAL) * CONVERT_INCHES_DEGREES_SLIDE);
   }
@@ -486,7 +486,7 @@ public class Robot {
     if (slideExtensionTargetPosition > slideExtensionMotor.getCurrentPosition()) {
       moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
       if (Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 50) {
-        //checkExtentionLimit();
+//        checkExtentionLimit();
         slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
       }
     } else if (slideExtensionTargetPosition < slideExtensionMotor.getCurrentPosition()) {
@@ -496,7 +496,7 @@ public class Robot {
       }
     } else {
       moveSlideRotationPIDF(slideRotationTargetPosition, slideRotationPower);
-      //checkExtentionLimit();
+//      checkExtentionLimit();
       slideExtensionMotor.setTargetPosition(slideExtensionTargetPosition);
     }
   }
@@ -556,8 +556,8 @@ public class Robot {
   }
 
   public boolean armReachedTarget() {
-    if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 20
-            && Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 20)
+    if (Math.abs(slideExtensionTargetPosition - slideExtensionMotor.getCurrentPosition()) < 40
+            && Math.abs(slideRotationTargetPosition - slideRotationMotor.getCurrentPosition()) < 40)
       return true;
     else
       return false;
@@ -698,43 +698,43 @@ public class Robot {
     return color;
   }
 
-  public boolean sampleToPickUp() {
-    red = colorSensor.red();
-    green = colorSensor.green();
-    blue = colorSensor.blue();
-    alpha = colorSensor.alpha();
-
-    if (red > redValues[0][0] && red < redValues[1][0] && green > redValues[0][1] && green < redValues[1][1] && blue > redValues[0][2] && blue < redValues[1][2]){
-      color = RED;
-    }
-    else if (red > yellowValues[0][0] && red < yellowValues[1][0] && green > yellowValues[0][1] && green < yellowValues[1][1] && blue > yellowValues[0][2] && blue < yellowValues[1][2]){
-      color = YELLOW;
-    }
-    else if (red > blueValues[0][0] && red < blueValues[1][0] && green > blueValues[0][1] && green < blueValues[1][1] && blue > blueValues[0][2] && blue < blueValues[1][2]){
-      color = BLUE;
-    }
-    else {
-      color = UNKNOWN;
-    }
-
-    myOpMode.telemetry.addData("Color", color.toString());
-    myOpMode.telemetry.addData("Red", red);
-    myOpMode.telemetry.addData("Green", green);
-    myOpMode.telemetry.addData("Blue", blue);
-    myOpMode.telemetry.addData("Alpha", alpha);
-
-    if (color == YELLOW) {
-      return true;
-    }
-    else if (color == RED && team == Team.RED) {
-      return true;
-    }
-    else if (color == BLUE && team == Team.BLUE) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
+//  public boolean sampleToPickUp() {
+//    red = colorSensor.red();
+//    green = colorSensor.green();
+//    blue = colorSensor.blue();
+//    alpha = colorSensor.alpha();
+//
+//    if (red > redValues[0][0] && red < redValues[1][0] && green > redValues[0][1] && green < redValues[1][1] && blue > redValues[0][2] && blue < redValues[1][2]){
+//      color = RED;
+//    }
+//    else if (red > yellowValues[0][0] && red < yellowValues[1][0] && green > yellowValues[0][1] && green < yellowValues[1][1] && blue > yellowValues[0][2] && blue < yellowValues[1][2]){
+//      color = YELLOW;
+//    }
+//    else if (red > blueValues[0][0] && red < blueValues[1][0] && green > blueValues[0][1] && green < blueValues[1][1] && blue > blueValues[0][2] && blue < blueValues[1][2]){
+//      color = BLUE;
+//    }
+//    else {
+//      color = UNKNOWN;
+//    }
+//
+//    myOpMode.telemetry.addData("Color", color.toString());
+//    myOpMode.telemetry.addData("Red", red);
+//    myOpMode.telemetry.addData("Green", green);
+//    myOpMode.telemetry.addData("Blue", blue);
+//    myOpMode.telemetry.addData("Alpha", alpha);
+//
+//    if (color == YELLOW) {
+//      return true;
+//    }
+//    else if (color == RED && team == Team.RED) {
+//      return true;
+//    }
+//    else if (color == BLUE && team == Team.BLUE) {
+//      return true;
+//    }
+//    else {
+//      return false;
+//    }
+//  }
 }
 
