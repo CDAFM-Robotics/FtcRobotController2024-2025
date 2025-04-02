@@ -68,7 +68,7 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar);
 
-    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 215) {
+    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 240) {
       rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
@@ -102,7 +102,7 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar2);
 
-    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 215) {
+    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 190) {
       rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);

@@ -81,7 +81,7 @@ public class RRPushTrajectories {
 
     // SPEC3 TO BAR
     specimenWallPosToBar2 = drive.actionBuilder(new Pose2d(48, -59, -Math.PI / 2))
-      .strafeToSplineHeading(new Vector2d(6, -49.5), Math.PI / 2) // TODO -38 -> -40
+      .strafeToSplineHeading(new Vector2d(3, -53.5), Math.PI / 2) // TODO -38 -> -40
 //      .strafeTo(new Vector2d(6, -43.5))  // TODO try to stop arm hitting bar
       .build();
 

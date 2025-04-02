@@ -112,7 +112,7 @@ public class Robot {
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
   public static int ARM_ROT_PICKUP_SAMPLES = 300;
   public static int ARM_ROT_PICKUP_WALL = 241;
-  public static int ARM_ROT_AUTO_PICKUP_WALL = 297;
+  public static int ARM_ROT_AUTO_PICKUP_WALL = 297+20;
   public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
   public static int ARM_ROT_AUTO_HANG = 1160; //1068; //1160
@@ -705,6 +705,7 @@ public class Robot {
 
   double prevAverageDist = 0;
   public double getAverageDistance() {
+    /*
     double left = getLeftDistance();
     double right = getRightDistance();
     double average = (left + right) / 2;
@@ -723,6 +724,9 @@ public class Robot {
     }
     prevAverageDist = averageFinal;
     return averageFinal;
+
+     */
+    return getLeftDistance();
   }
 
 //  public boolean sampleToPickUp() {
