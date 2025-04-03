@@ -125,7 +125,7 @@ public class RRTrajectories {
       .build(); // Y was -49.5
 
     netToFirstYellowSample = drive.actionBuilder(new Pose2d(-61, -48, Math.PI /2))
-      .strafeToSplineHeading(new Vector2d(-47, -49.5), Math.PI / 2)
+      .strafeToSplineHeading(new Vector2d(-46, -49.5), Math.PI / 2)
       .build(); // TODO was -46
 
     firstYellowSampleToNet = drive.actionBuilder(new Pose2d(-46, -49.5, Math.PI / 2))
@@ -133,7 +133,7 @@ public class RRTrajectories {
       .build(); // TODO was -62 -49.5
 
     netToSecondYellowSample = drive.actionBuilder(new Pose2d(-61, -48, Math.PI / 2))
-      .strafeToSplineHeading(new Vector2d(-56.5, -49.5), Math.PI / 2)
+      .strafeToSplineHeading(new Vector2d(-57.5, -49.5), Math.PI / 2)
       .build();
 
     secondYellowSampleToNet = drive.actionBuilder(new Pose2d(-56.5, -49.5, Math.PI / 2))

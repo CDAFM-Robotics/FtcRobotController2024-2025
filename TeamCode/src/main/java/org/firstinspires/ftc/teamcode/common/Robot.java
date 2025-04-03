@@ -116,7 +116,7 @@ public class Robot {
   public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
   public static int ARM_ROT_AUTO_HANG = 1160; //1068; //1160
-  public static int ARM_ROT_AUTO_DROP_OFF_SAMPLES = 1580;
+  public static int ARM_ROT_AUTO_DROP_OFF_SAMPLES = 1550;
   public static int ARM_ROT_AUTO_DRIVE = 1123;
   public static int ARM_ROT_AUTO_PICKUP = 356;
 

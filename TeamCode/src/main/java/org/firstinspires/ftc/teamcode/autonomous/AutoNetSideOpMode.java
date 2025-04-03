@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.common.RRPushTrajectories;
 import org.firstinspires.ftc.teamcode.common.RRTrajectories;
@@ -26,7 +27,10 @@ public class AutoNetSideOpMode extends LinearOpMode {
     robot.initializeArmDevices();
     rrTrajectories.initTrajectories();
     trajectories = rrTrajectories.getLeftSideTrajectories();
-
+    robot.slideRotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    robot.slideRotationMotor.setTargetPosition(0);
+    robot.slideRotationMotor.setPower(1);
+    robot.slideRotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
     waitForStart();
 
