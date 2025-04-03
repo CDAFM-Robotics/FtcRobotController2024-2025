@@ -112,7 +112,7 @@ public class Robot {
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
   public static int ARM_ROT_PICKUP_SAMPLES = 300;
   public static int ARM_ROT_PICKUP_WALL = 241;
-  public static int ARM_ROT_AUTO_PICKUP_WALL = 297 + 10; // TODO: rollback +20 from earlier
+  public static int ARM_ROT_AUTO_PICKUP_WALL = 297 + 20; // TODO: rollback +20 from earlier
   public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
   public static int ARM_ROT_AUTO_HANG = 1160; //1068; //1160
@@ -697,10 +697,10 @@ public class Robot {
  */
 
   public double getLeftDistance() {
-    return distanceSensorLeft.getDistance(DistanceUnit.MM);
+    return distanceSensorLeft.getDistance(DistanceUnit.INCH);
   }
   public double getRightDistance() {
-    return distanceSensorRight.getDistance(DistanceUnit.MM);
+    return distanceSensorRight.getDistance(DistanceUnit.INCH);
   }
 
 

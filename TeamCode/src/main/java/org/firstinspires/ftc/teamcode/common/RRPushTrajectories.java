@@ -49,9 +49,27 @@ public class RRPushTrajectories {
       .build();
 
     // PUSH 2 Samples BACK to WALL
+//    barToObservationZoneAnd3Samples = drive.actionBuilder(new Pose2d(10, -38.5, Math.PI / 2)) // 0,-31 -> 0,-36
+//      .setTangent(-Math.PI / 2) // TODO: 1:22 24Jan 50->53 (slightly more left)
+//            // TODO 28 speed constraint on trajectory
+//      .splineToConstantHeading(new Vector2d(35, -34), Math.PI / 2, new TranslationalVelConstraint(20)) //x:40 was -24
+//      .splineToConstantHeading(new Vector2d(40, -15), 0, new TranslationalVelConstraint(20))
+//      .splineToConstantHeading(new Vector2d(48, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+//      .splineToConstantHeading(new Vector2d(48, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
+//      .splineToConstantHeading(new Vector2d(43, -24), Math.PI / 2, new TranslationalVelConstraint(20))
+//      .splineToConstantHeading(new Vector2d(50, -15), 0, new TranslationalVelConstraint(20))
+//      .splineToConstantHeading(new Vector2d(59, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
+//      .splineToConstantHeading(new Vector2d(59, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
+//            // TODO ------------- position for wall approach
+//      .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO
+//      // -63 -> -62 // was -50 moved forward to hopefully not hit sample on spin.
+//            // TODO -61.5 to 61 April 3, 2025
+//      .strafeTo(new Vector2d(48, -61), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(10), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO 1/3->2/3 do we need ang constraint here?
+//      .build();
+
     barToObservationZoneAnd3Samples = drive.actionBuilder(new Pose2d(10, -38.5, Math.PI / 2)) // 0,-31 -> 0,-36
       .setTangent(-Math.PI / 2) // TODO: 1:22 24Jan 50->53 (slightly more left)
-            // TODO 28 speed constraint on trajectory
+      // TODO 28 speed constraint on trajectory
       .splineToConstantHeading(new Vector2d(35, -34), Math.PI / 2, new TranslationalVelConstraint(20)) //x:40 was -24
       .splineToConstantHeading(new Vector2d(40, -15), 0, new TranslationalVelConstraint(20))
       .splineToConstantHeading(new Vector2d(48, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
@@ -60,20 +78,21 @@ public class RRPushTrajectories {
       .splineToConstantHeading(new Vector2d(50, -15), 0, new TranslationalVelConstraint(20))
       .splineToConstantHeading(new Vector2d(59, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
       .splineToConstantHeading(new Vector2d(59, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
-            // TODO ------------- position for wall approach
+      // TODO ------------- position for wall approach
       .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO
       // -63 -> -62 // was -50 moved forward to hopefully not hit sample on spin.
-            // TODO -64 -> -62
-      .strafeTo(new Vector2d(48, -61.5), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(10), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO 1/3->2/3 do we need ang constraint here?
+      // TODO -61.5 to 61 April 3, 2025
+      .strafeTo(new Vector2d(48, -61), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(10), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO 1/3->2/3 do we need ang constraint here?
       .build();
 
+
     // SPEC2 TO BAR
-    specimenWallPosToBar = drive.actionBuilder(new Pose2d(48, -61.5, -Math.PI / 2))
-      .strafeToSplineHeading(new Vector2d(8, -46.5), Math.PI / 2) // was -38 was 38.2
+    specimenWallPosToBar = drive.actionBuilder(new Pose2d(48, -61, -Math.PI / 2))
+      .strafeToSplineHeading(new Vector2d(7, -47.5), Math.PI / 2) // was -38 was 38.2
       .build();
 
     // BACK TO WALL
-    barToSpecimenWallPos = drive.actionBuilder(new Pose2d(8, -40.5, Math.PI / 2)) // TODO was -38.2
+    barToSpecimenWallPos = drive.actionBuilder(new Pose2d(7, -40.5, Math.PI / 2)) // TODO was -38.2
       .setTangent(-Math.PI / 2)
       .splineToSplineHeading(new Pose2d(48, -50, -Math.PI / 2), 0)
       .strafeTo(new Vector2d(48, -61))

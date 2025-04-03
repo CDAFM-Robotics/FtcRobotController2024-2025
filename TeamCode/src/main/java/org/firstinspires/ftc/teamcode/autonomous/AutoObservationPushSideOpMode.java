@@ -76,8 +76,8 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     //double y = robot.getRightDistance();
 
     double Q = 0.3; // High values put more emphasis on the sensor.
-    double R = 5; // High Values put more emphasis on regression.
-    int N = 10; // The number of estimates in the past we perform regression on.
+    double R = 4; // High Values put more emphasis on regression.
+    int N = 3; // The number of estimates in the past we perform regression on.
     KalmanFilter filterLeft = new KalmanFilter(Q,R,N);
     KalmanFilter filterRight = new KalmanFilter(Q,R,N);
 
@@ -89,37 +89,37 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
     telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
     // Get up to 'N' values for linear regression to create prediction TODO: UNTESTED
-    for (int i=0; i<(N-1); i++) {
+    for (int i=0; i<10; i++) {
       currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
       estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
       currentValueR = robot.getRightDistance();  // noisy sensor
       estimateR = filterRight.estimate(currentValueR); // smoothed sensor
 
-      telemetry.addData("left", String.format("%.01f mm", estimateL));
-      telemetry.addData("right", String.format("%.01f mm", estimateR));
+      telemetry.addData("init left", String.format("%.01f mm", estimateL));
+      telemetry.addData("init right", String.format("%.01f mm", estimateR)); currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
       telemetry.update();
-
     }
 
     // use smoothed value
-    while ((estimateL + estimateR)/2  > 160) {
+    while (estimateL > 155) {
       rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
-
-      telemetry.addData("left", String.format("%.01f mm", estimateL));
-      telemetry.addData("right", String.format("%.01f mm", estimateR));
-      telemetry.update();
 
       // get next value
       // x = robot.getLeftDistance();
       // y = robot.getRightDistance();
       currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
       estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
-      currentValueR = robot.getRightDistance();  // noisy sensor
-      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+//      currentValueR = robot.getRightDistance();  // noisy sensor
+//      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+      telemetry.addData("only left", String.format("%.01f mm", estimateL));
+      telemetry.addData("not used right", String.format("%.01f mm", estimateR));
+      telemetry.update();
     }
+
+
     rrTrajectories.drive.rightFront.setPower(0);
     rrTrajectories.drive.leftFront.setPower(0);
     rrTrajectories.drive.rightBack.setPower(0);
@@ -148,12 +148,36 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar2);
 
-    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 190) {
+    // Get up to 'N' values for linear regression to create prediction TODO: UNTESTED
+    for (int i=0; i<10; i++) {
+      currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
+      estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
+      currentValueR = robot.getRightDistance();  // noisy sensor
+      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+
+      telemetry.addData("init 2 left", String.format("%.01f mm", estimateL));
+      telemetry.addData("init 2 right", String.format("%.01f mm", estimateR));
+      telemetry.update();
+
+    }
+
+
+    while ((estimateL + estimateR) / 2 > 210) {
       rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+
+      currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
+      estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
+      currentValueR = robot.getRightDistance();  // noisy sensor
+      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+      telemetry.addData("both left", String.format("%.01f mm", estimateL));
+      telemetry.addData("both right", String.format("%.01f mm", estimateR));
+      telemetry.update();
     }
+
+
     rrTrajectories.drive.rightFront.setPower(0);
     rrTrajectories.drive.leftFront.setPower(0);
     rrTrajectories.drive.rightBack.setPower(0);
