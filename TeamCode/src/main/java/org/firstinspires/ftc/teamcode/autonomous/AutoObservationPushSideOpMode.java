@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.KalmanFilter;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.common.RRPushTrajectories;
 import org.firstinspires.ftc.teamcode.common.Robot;
 
@@ -68,11 +72,53 @@ public class AutoObservationPushSideOpMode extends LinearOpMode {
 
     Actions.runBlocking(rrTrajectories.specimenWallPosToBar);
 
-    while ((robot.getLeftDistance() + robot.getRightDistance()) / 2 > 240) {
+    //double x = robot.getLeftDistance();
+    //double y = robot.getRightDistance();
+
+    double Q = 0.3; // High values put more emphasis on the sensor.
+    double R = 5; // High Values put more emphasis on regression.
+    int N = 10; // The number of estimates in the past we perform regression on.
+    KalmanFilter filterLeft = new KalmanFilter(Q,R,N);
+    KalmanFilter filterRight = new KalmanFilter(Q,R,N);
+
+    double currentValueL = robot.getLeftDistance();  // noisy sensor
+    double estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
+    double currentValueR = robot.getRightDistance();  // noisy sensor
+    double estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+
+    telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+    // Get up to 'N' values for linear regression to create prediction TODO: UNTESTED
+    for (int i=0; i<(N-1); i++) {
+      currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
+      estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
+      currentValueR = robot.getRightDistance();  // noisy sensor
+      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
+
+      telemetry.addData("left", String.format("%.01f mm", estimateL));
+      telemetry.addData("right", String.format("%.01f mm", estimateR));
+      telemetry.update();
+
+    }
+
+    // use smoothed value
+    while ((estimateL + estimateR)/2  > 160) {
       rrTrajectories.drive.rightFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftFront.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.rightBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
       rrTrajectories.drive.leftBack.setPower(Robot.DRIVE_TRAIN_SPEED_AUTO_TO_BAR);
+
+      telemetry.addData("left", String.format("%.01f mm", estimateL));
+      telemetry.addData("right", String.format("%.01f mm", estimateR));
+      telemetry.update();
+
+      // get next value
+      // x = robot.getLeftDistance();
+      // y = robot.getRightDistance();
+      currentValueL = robot.getLeftDistance();  // imaginary, noisy sensor
+      estimateL = filterLeft.estimate(currentValueL); // smoothed sensor
+      currentValueR = robot.getRightDistance();  // noisy sensor
+      estimateR = filterRight.estimate(currentValueR); // smoothed sensor
     }
     rrTrajectories.drive.rightFront.setPower(0);
     rrTrajectories.drive.leftFront.setPower(0);

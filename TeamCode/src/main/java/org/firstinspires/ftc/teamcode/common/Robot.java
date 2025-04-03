@@ -100,7 +100,7 @@ public class Robot {
   public static int ARM_EXT_HANG_ROBOT = 2100;
   public static int ARM_EXT_HANG_ROBOT_PULL = 200;
 
-  public static int ARM_EXT_AUTO_HANG = 1100; // TODO: 1009(1:21pm) 24Jan->1034->1040 little higher for different grip on spec
+  public static int ARM_EXT_AUTO_HANG = 1130; // TODO: 1100 (2Apr25:9) 1009(1:21pm) 24Jan->1034->1040 little higher for different grip on spec
   public static int ARM_EXT_AUTO_HANG_PULL = 425;
   public static int ARM_EXT_AUTO_PICKUP = 1152; //todo fine tune
   public static int ARM_EXT_AUTO_DROP_OBSERVE = (int) (4600/2.66); //todo fine tune
@@ -112,7 +112,7 @@ public class Robot {
   public static int ARM_ROT_HANG_TOP_SPECIMEN = 1202;
   public static int ARM_ROT_PICKUP_SAMPLES = 300;
   public static int ARM_ROT_PICKUP_WALL = 241;
-  public static int ARM_ROT_AUTO_PICKUP_WALL = 297+20;
+  public static int ARM_ROT_AUTO_PICKUP_WALL = 297 + 10; // TODO: rollback +20 from earlier
   public static int ARM_ROT_DRIVE = 650;
   public static int ARM_ROT_HANG_ROBOT = 1050;
   public static int ARM_ROT_AUTO_HANG = 1160; //1068; //1160
@@ -703,8 +703,11 @@ public class Robot {
     return distanceSensorRight.getDistance(DistanceUnit.MM);
   }
 
+
   double prevAverageDist = 0;
   public double getAverageDistance() {
+
+
     /*
     double left = getLeftDistance();
     double right = getRightDistance();

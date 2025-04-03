@@ -137,6 +137,25 @@ public class AutoNetSideOpMode extends LinearOpMode {
     robot.slideRotationMotor.setPower(0.3);
     robot.slideRotationMotor.setTargetPosition(0);
 
+    /*
+    // THIRD SAMPLE
+    Actions.runBlocking(rrTrajectories.netToThirdYellowSampleWall);
+
+    sleep(500);
+
+    robot.setClawPanServoPosition(Robot.CLAW_PAN_POSITION_AUTO_PICKUP_DIP);
+
+    sleep(500);
+
+    robot.setClawGrabServoPosition(Robot.CLAW_GRAB_POSITION_CLOSED);
+
+
+
+    robot.slideRotationMotor.setPower(1.0);
+    robot.slideRotationMotor.setTargetPosition(Robot.ARM_ROT_AUTO_DROP_OFF_SAMPLES);
+    robot.slideExtensionMotor.setTargetPosition(0);
+ */
+
     sleep(100000);
 
   }

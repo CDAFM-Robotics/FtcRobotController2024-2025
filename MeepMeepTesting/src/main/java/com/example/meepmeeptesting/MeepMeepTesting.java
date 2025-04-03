@@ -24,6 +24,12 @@ public class MeepMeepTesting{
         .splineToConstantHeading(new Vector2d(-24, 0), 0)
         .build());
 
+    myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-61, -48, Math.PI / 2))
+            .strafeToSplineHeading(new Vector2d(-52, -48), Math.PI-(Math.PI/4))
+            .build());
+
+
+
     meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
       .setDarkMode(true)
       .setBackgroundAlpha(0.95f)

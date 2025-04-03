@@ -139,15 +139,16 @@ public class RRTrajectories {
     secondYellowSampleToNet = drive.actionBuilder(new Pose2d(-56.5, -49.5, Math.PI / 2))
       .strafeToSplineHeading(new Vector2d(-61, -48), Math.PI / 2)
       .build(); // TODO was -62 -49.5
-/*
-    netToThirdYellowSampleWall = drive.actionBuilder(new Pose2d(-60, -49.5, Math.PI / 2))
-      .strafeToSplineHeading(new Vector2d(-60, -25.75), Math.PI)
+
+
+    netToThirdYellowSampleWall = drive.actionBuilder(new Pose2d(-61, -48, Math.PI / 2))
+      .strafeToSplineHeading(new Vector2d(-52, -48), Math.PI-(Math.PI/4))
       .build();
 
-    thirdYellowSampleWallToNet = drive.actionBuilder(new Pose2d(-60, -25.75, Math.PI))
+    thirdYellowSampleWallToNet = drive.actionBuilder(new Pose2d(-52, -48, Math.PI-(Math.PI/4)))
       .strafeToSplineHeading(new Vector2d(-62, -49.5), Math.PI / 2)
       .build();
-*/
+
     leftSideTrajectories = new Action[] {leftStartToNet, netToFirstYellowSample, firstYellowSampleToNet, netToSecondYellowSample, secondYellowSampleToNet, netToThirdYellowSampleWall, thirdYellowSampleWallToNet};
   }
 
