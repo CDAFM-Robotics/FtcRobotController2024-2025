@@ -79,10 +79,10 @@ public class RRPushTrajectories {
       .splineToConstantHeading(new Vector2d(59, -24), -Math.PI / 2, new TranslationalVelConstraint(20))
       .splineToConstantHeading(new Vector2d(59, -53), -Math.PI / 2, new TranslationalVelConstraint(20)) // TODO
       // TODO ------------- position for wall approach
-      .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO
+      .splineToSplineHeading(new Pose2d(48, -48, -Math.PI / 2), -Math.PI / 2 /*, new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(25), new AngularVelConstraint(Math.PI * 2 / 3)))*/ ) // TODO
       // -63 -> -62 // was -50 moved forward to hopefully not hit sample on spin.
-      // TODO -61.5 to 61 April 3, 2025
-      .strafeTo(new Vector2d(48, -61), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(10), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO 1/3->2/3 do we need ang constraint here?
+      // TODO REMOVE FOR JUST IN TIME TRAJECTORY
+      .strafeTo(new Vector2d(48, -55), new MinVelConstraint(Arrays.asList(new TranslationalVelConstraint(10), new AngularVelConstraint(Math.PI * 2 / 3)))) // TODO 1/3->2/3 do we need ang constraint here?
       .build();
 
 
